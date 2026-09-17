@@ -25,6 +25,48 @@ final class Ru2Zh {
      *  when this is true. Release: enabled. Not final so the unit tests can exercise both paths. */
     static boolean ALLOW_UNSAFE = true;
 
+    // Field data 14–17.09.2026 (backend failure log, ~180 cars): these stock intents come back UNKNOWN on
+    // every car that tried them, in every Chinese wording the backend retried — the A06 offline NLU simply
+    // does not have them. Mapping them only costs the driver two failed attempts and a "не умею"; with the
+    // switch off the phrase goes straight to the backend (radio → opens the radio/music app, the rest → an
+    // honest one-line answer). Flip a switch back on if a firmware ever gains the intent.
+    static boolean FM_RADIO_OFFLINE   = false;   // 打开收音机: 19 failures / 15 cars, retries 开启收音机, 播放广播 failed
+    static boolean WIPER_ONOFF_OFFLINE = false;  // 打开雨刮 15/6 cars (+打开雨刮器/雨刷器/雨刷); 打开雨刮维修模式 5/4 cars
+    static boolean DRIVE_MODE_OFFLINE = false;   // 切换到运动模式 12/8 cars (+运动驾驶模式 in 5 wordings) — SET_DRIVING_MODE
+    static boolean SIDE_LIGHTS_OFFLINE = false;  // 打开示廓灯 7/5 cars, retry 打开位置灯 failed 4×
+
+    /** Third-party brands: «открой яндекс музыку», «включи яндекс радио», «вк музыка» name an APP the backend
+     *  launches (appActions) — never the stock player / FM app the generic words would map to. */
+    private static final java.util.regex.Pattern BRAND = java.util.regex.Pattern.compile(
+        "(?<![а-яa-z])(яндекс|yandex|вконтакте|вк музык|спотифай|spotify|ютуб|youtube|рутуб|rutube|кинопоиск|телеграм|telegram"
+        + "|ватсап|whatsapp|2гис|дубльгис|сбер|литрес|окко|иви|wink|винк|звук ?ком)");
+
+    /** Action verbs — a phrase with two verb clauses joined by «и/затем/потом» is a COMPOUND command. */
+    private static final java.util.regex.Pattern CMD_VERB = java.util.regex.Pattern.compile(
+        "(?<![а-я])(включи|включай|выключи|выключай|отключи|открой|открывай|закрой|закрывай|поставь|сделай|подними|опусти"
+        + "|запусти|останови|убавь|прибавь|увеличь|уменьши|переключи|смени|вруби|выруби|погаси|зажги|сложи|разложи"
+        + "|подогрей|охлади|прогрей|установи|приоткрой)(?![а-я])");
+    private static final String CONJ = "\\s+(?:и|а также|а потом|и потом|затем|потом|после этого)\\s+";
+
+    /** Clauses of a compound command («закрой все окна и выключи климат»), or null if the phrase is simple. */
+    static String[] clausesOf(String s) {
+        String[] parts = s.trim().split(CONJ);
+        if (parts.length < 2 || parts.length > 3) return null;
+        for (String p : parts) if (!CMD_VERB.matcher(p).find()) return null;   // «дуй в лицо и в ноги» stays simple
+        return parts;
+    }
+
+    /** All commands of a phrase, in order: one element for a simple phrase, one per clause for a compound.
+     *  null if ANY clause is not a known command — a half-executed request is worse than a backend round-trip. */
+    static String[] ru2zhAll(String t, int speakerDir) {
+        String s = t.toLowerCase().replace('ё', 'е');
+        String[] parts = clausesOf(s);
+        if (parts == null) { String one = ru2zh(t, speakerDir); return one == null ? null : new String[]{one}; }
+        String[] out = new String[parts.length];
+        for (int i = 0; i < parts.length; i++) { out[i] = ru2zh(parts[i], speakerDir); if (out[i] == null) return null; }
+        return out;
+    }
+
     /** Told about every command unsafeGate() blocked (RuBridge logs it + shows a hint). */
     interface UnsafeListener { void blocked(String zh); }
     static volatile UnsafeListener onUnsafeBlocked;
@@ -149,7 +191,7 @@ final class Ru2Zh {
         if (s.contains("настройк")) return "设置";
         if (s.contains("камер")) return "相机";
         if (s.contains("телефон")) return "电话";
-        if (s.contains("радио")) return "收音机";
+        if (s.contains("радио")) return FM_RADIO_OFFLINE ? "收音机" : "";   // no FM app intent on the A06 (field data)
         if (s.contains("браузер") || s.contains("интернет")) return "浏览器";
         if (s.contains("видео") && !s.contains("сними") && !s.contains("запиши")) return "视频";
         if (s.contains("карт") && !s.contains("карточк")) return "地图";
@@ -194,7 +236,9 @@ final class Ru2Zh {
         // 女王驾到|仙女副驾|仙女下凡|浪漫接驾|零重力休息 (there is NO plain 露营模式)
         if (s.contains("кино") || s.contains("фильм")) return "影院模式";
         if (s.contains("кроват") || s.contains("спальн") || s.contains("для сна")) return "大床模式";
-        if (s.contains("отдых") || s.contains("рассла")) return "休息空间";
+        if ((s.contains("отдых") || s.contains("рассла")) && !s.contains("отдыхай")     // «всё, отдыхай» dismisses the assistant
+            && (s.contains("режим") || s.contains("простран") || s.contains("зон") || s.contains("включи") || s.contains("хочу")))
+            return "休息空间";
         if (s.contains("кемпинг") || s.contains("палатк") || s.contains("лагер")) {
             if (s.contains("охран") || s.contains("сторож") || s.contains("защит")) return "营地守护";
             if (s.contains("караоке") || s.contains("пой") || s.contains("петь") || s.contains("песн")) return "露营嗨唱模式";
@@ -255,6 +299,7 @@ final class Ru2Zh {
 
     static boolean isGuarded(String s) {
         // negation: "не закрывай окно" must not actuate anything -> chat/stub
+        if (s.contains(" или ")) return true;   // «мужской голос или женский», «последовательный гибрид или параллельный» — a question
         if (s.contains("не включ") || s.contains("не выключ") || s.contains("не откр") || s.contains("не закр")
             || s.contains("не вруб") || s.contains("не выруб") || s.contains("не отключ") || s.contains("не убир")
             || s.contains("не едь") || s.contains("не езжай") || s.contains("не гони"))
@@ -291,6 +336,11 @@ final class Ru2Zh {
      *                    used as the default zone when the phrase names none ("подогрей сиденье"). */
     static String ru2zh(String t, int speakerDir) {
         String s = t.toLowerCase().replace('ё', 'е');
+        s = s.replaceAll("(?<![а-я])клима(?![а-я])", "климат");   // ASR drops the final «т» («включи клима двадцать шесть»)
+        // A compound («закрой все окна и выключи климат») must not be mapped as ONE command: the single mapper
+        // picked one clause and bled the other's slots into it (关闭所有空调). ru2zhAll() maps it clause by clause.
+        if (clausesOf(s) != null) return null;
+        if (BRAND.matcher(s).find()) return null;                  // a named third-party app → backend launches it
         // Vehicle-status questions ("сколько осталось заряда", "какой запас хода", "давление в шинах") are
         // answered by the CAR with live data — they must win over the question-word guard below, which
         // would otherwise ship them to the LLM (which cannot read car state). Checked first on purpose.
@@ -458,7 +508,9 @@ final class Ru2Zh {
             && (s.contains("салон") || s.contains("машин") || s.contains("тачк")))
             return strong ? "打开强力制热模式" : "打开制热模式";                            // «быстро прогрей» -> 强力制热
         if (s.contains("охлади") || s.contains("остуди")) return strong ? "打开强力制冷模式" : "打开制冷模式";
-        if (s.contains("проветри") || (s.contains("свеж") && s.contains("воздух"))) return "打开外循环"; // "свежий воздух"
+        if (s.contains("проветри") || (s.contains("свеж") && s.contains("воздух"))
+            || ((s.contains("наружн") || s.contains("внешн") || s.contains("уличн") || s.contains("с улицы")) && s.contains("воздух")
+                && !s.contains("авто") && !s.contains("забор"))) return "打开外循环";            // "свежий/наружный воздух"
         if ((s.contains("очист") && s.contains("воздух")) || (s.contains("очистител") && !s.contains("стекл"))
             || s.contains("ионизац"))                                                        // не «стеклоОЧИСТИТЕЛи»
             return (off ? "关闭" : "打开") + (s.contains("авто") ? "自动空气净化器" : "空气净化"); // catalog modes: 空气净化 | 自动空气净化器
@@ -572,7 +624,7 @@ final class Ru2Zh {
         // "окон" (gen.pl.) does NOT contain "окн" — fleeting vowel, match both forms
         // "стекло" is the everyday word for a car window ("опусти стекло") — but only with
         // open/close verbs and outside washer/defrost contexts
-        boolean glass = s.contains("стекл") && !s.contains("помой") && !s.contains("омыват")
+        boolean glass = s.contains("стекл") && !s.contains("стеклоочист") && !s.contains("помой") && !s.contains("омыват")
             && !s.contains("обогрев") && !s.contains("обдув") && !s.contains("лобов")
             && !s.contains("протри") && !s.contains("вытри") && !s.contains("запотел")
             && (s.contains("подним") || s.contains("опусти") || s.contains("приоткр")
@@ -597,6 +649,8 @@ final class Ru2Zh {
             }
             if (s.contains("приоткр") || s.contains("щелочк") || s.contains("щель")) return z + "车窗留缝";
             int p = percentOf(s);
+            // «закрой окно на 90 процентов» = leave it 10% open (the ratio slot is the OPENING)
+            if (p > 0 && p < 100 && (s.contains("закр") || s.contains("подним"))) p = 100 - p;
             if (p == 50) return z + "车窗开一半";
             if (p > 0) return z + "车窗开到百分之" + p;
             // "опусти" = OPEN (window goes down), "подними/вверх" = CLOSE — inverse of isOff!
@@ -617,7 +671,15 @@ final class Ru2Zh {
             return off ? "关闭天窗" : "打开天窗";
         }
         if (s.contains("шторк") || s.contains("солнцезащит")) {
-            if (win || s.contains("боков") || s.contains("задн") || s.contains("сзади"))
+            boolean winShade = win || s.contains("боков") || s.contains("задн") || s.contains("сзади");
+            // Partial opening (user report 17.09: «шторка панорамы наполовину» only ever went fully open/closed —
+            // the percent was dropped here). Same `ratio` slot and wording as the sunroof (天窗开一半 was captured
+            // on the car); the 遮阳帘 forms themselves are NOT yet confirmed on a car. «закрой на 30%» = 70% open.
+            int sp = winShade ? -1 : percentOf(s);
+            if (sp > 0 && sp < 100 && off) sp = 100 - sp;
+            if (sp == 50) return "遮阳帘开一半";
+            if (sp > 0 && sp < 100) return "遮阳帘开到百分之" + sp;
+            if (winShade)
                 return (off ? "关闭" : "打开") + "车窗遮阳帘";                                // SET_WINDOW_SUN_SHADE
             return off ? "关闭遮阳帘" : "打开遮阳帘";                                        // SET_SUN_SHADE
         }
@@ -739,9 +801,9 @@ final class Ru2Zh {
         }
         if ((s.contains("потолоч") || s.contains("потолк") || s.contains("верхний свет")) && !s.contains("подсветк"))
             return (off ? "关闭" : "打开") + "车顶灯";                                         // catalog: 车顶灯
-        if (s.contains("габарит")) return (off ? "关闭" : "打开") + "示廓灯";                 // OP_OUTLINE_LIGHT
+        if (s.contains("габарит")) return SIDE_LIGHTS_OFFLINE ? (off ? "关闭" : "打开") + "示廓灯" : null; // OP_OUTLINE_LIGHT
         if (s.contains("стояночн") || s.contains("позиционн") || hasWord(s, DRL_WORD))
-            return (off ? "关闭" : "打开") + "位置灯";                                        // OP_SIDE_LIGHTS (+ДХО: ближайший интент)
+            return SIDE_LIGHTS_OFFLINE ? (off ? "关闭" : "打开") + "位置灯" : null;            // OP_SIDE_LIGHTS (+ДХО: ближайший интент)
         if (s.contains("задн") && (s.contains("фонар") || s.contains("фонарь"))) return (off ? "关闭" : "打开") + "尾灯"; // OP_TAILLIGHT
         if (s.contains("багажник") && (s.contains("свет") || s.contains("ламп"))) return (off ? "关闭" : "打开") + "后备箱灯"; // OP_TRUNK_LIGHT
         if ((s.contains("притуш") || s.contains("приглуш")) && s.contains("свет")) return "氛围灯调暗一点";
@@ -811,17 +873,19 @@ final class Ru2Zh {
         if (s.contains("датчик") && s.contains("дожд"))                                       // SET_WIPER_SENSITIVITY (без слова "дворники")
             return grade.equals("MINUS") ? "雨刮灵敏度调低一点" : "雨刮灵敏度调高一点";
         if ((s.contains("вытри") || s.contains("протри") || s.contains("смахни")) && s.contains("стекл"))
-            return "打开雨刮";                                                                // "протри/смахни капли со стекла"
+            return WIPER_ONOFF_OFFLINE ? "打开雨刮" : null;                                   // "протри/смахни капли со стекла"
         if (s.contains("дворник") || s.contains("щетк") || s.contains("стеклоочистит")) {
             if (s.contains("задн") || s.contains("сзади")) return (off ? "关闭" : "打开") + "后雨刮器"; // catalog: 后雨刮器
-            if (s.contains("сервис") || s.contains("ремонт") || s.contains("замен"))
-                return (off ? "关闭" : "打开") + "雨刮维修模式";                              // REPAIR_WIPER
+            // «подними щётки/дворники», «сервисное положение» = the service position, NOT «switch the wipers on»
+            if (s.contains("сервис") || s.contains("ремонт") || s.contains("замен") || s.contains("подним")
+                || s.contains("подыми") || s.contains("обслуживан"))
+                return WIPER_ONOFF_OFFLINE ? ((off && !s.contains("подним")) ? "关闭" : "打开") + "雨刮维修模式" : null; // REPAIR_WIPER
             if (s.contains("чувствительн") || s.contains("датчик"))                           // SET_WIPER_SENSITIVITY
                 return grade.equals("MINUS") ? "雨刮灵敏度调低一点" : "雨刮灵敏度调高一点";
             if (n >= 1 && n <= 4) return "雨刮调到" + n + "档";                                // SET_WIPER_SPEED
             if (s.contains("быстрее") || grade.equals("PLUS") || grade.equals("MAX")) return "雨刮快一点";
             if (s.contains("медленн") || grade.equals("MINUS")) return "雨刮慢一点";
-            return off ? "关闭雨刮" : "打开雨刮";
+            return WIPER_ONOFF_OFFLINE ? (off ? "关闭雨刮" : "打开雨刮") : null;               // incl. «дежурный режим»
         }
         return null;
     }
@@ -914,8 +978,9 @@ final class Ru2Zh {
         }
         if (s.contains("держи полос") || s.contains("держись полос")) return unsafeGate("保持车道行驶"); // KEEP_LANE_DRIVE
         if (s.contains("обгони")) return unsafeGate("超过前车");                              // OVERTAKE_SPECIFIC_CAR
-        if (s.contains("ограничен") && s.contains("скорост"))
-            return unsafeGate((off ? "关闭" : "打开") + "限速提醒");                          // SPEED_LIMIT_CONTROL
+        if (s.contains("ограничен") && s.contains("скорост")
+            && (s.contains("напомин") || s.contains("предупрежд") || s.contains("оповещ") || s.contains("сигнал")))
+            return unsafeGate((off ? "关闭" : "打开") + "限速提醒");                          // SPEED_LIMIT_CONTROL — «ограничение на 60» is a limiter value → backend
         if (s.contains("парк")) {
             if (s.contains("запомни")) return unsafeGate("开始记忆泊车");                      // MEMORIZE_DRIVING_CONTROL
             if (s.contains("удали") || s.contains("забудь")) return unsafeGate("删除记忆泊车路线"); // DELETE_DRIVE_MEMORY
@@ -952,18 +1017,22 @@ final class Ru2Zh {
             && !s.contains("экран") && !s.contains("холодильник") && !s.contains("климат") && !s.contains("кондиц")
             && (s.contains("режим") || s.contains("вожден") || s.contains("переключ")
                 || s.contains("включи") || s.trim().equals("эко") || s.trim().equals("спорт")))
-            return "切换到" + dm;                                                             // SET_DRIVING_MODE
+            return DRIVE_MODE_OFFLINE ? "切换到" + dm : null;                                 // SET_DRIVING_MODE
         // hybrid/EREV energy modes (carControl@SET_ENERGY_MODE) — LOCAL NLU vocabulary (verified
         // on-device: the cloud words 增程/燃油 come back UNKNOWN locally; these actuate):
         //   纯电 (electric) / 燃油优先 (fuel) / 智能增程 (auto/smart) / 混动 (hybrid).
-        if (s.contains("электро") || s.contains("электрич"))
+        // energy modes need a command shape: «у него последовательный гибрид…» is talk, not a mode switch
+        boolean modeCmd = s.contains("режим") || s.contains("включи") || s.contains("переключ") || s.contains("поставь")
+            || s.contains("перейди") || s.contains("едь на") || s.contains("езжай на") || s.trim().split("\\s+").length <= 2;
+        if (!modeCmd) { /* fall through to suspension / loading below */ }
+        else if (s.contains("электро") || s.contains("электрич"))
             return "切换到纯电模式";                                                          // electric (纯电)
-        if (s.contains("топлив") || s.contains("на бензин") || s.contains("бензинов") || s.contains("на двигател"))
+        else if (s.contains("топлив") || s.contains("на бензин") || s.contains("бензинов") || s.contains("на двигател"))
             return "切换到燃油优先模式";                                                       // fuel (燃油优先)
-        if (s.contains("авто режим") || s.contains("авторежим") || s.contains("на авто")
+        else if (s.contains("авто режим") || s.contains("авторежим") || s.contains("на авто")
             || s.contains("автоматическ") || s.contains("умный режим") || s.contains("интеллект") || s.contains("智能"))
             return "切换到智能增程模式";                                                       // auto / smart (智能增程)
-        if (s.contains("гибрид") || s.contains("увеличен запас") || s.contains("комбинир") || s.contains("混动"))
+        else if (s.contains("гибрид") || s.contains("увеличен запас") || s.contains("комбинир") || s.contains("混动"))
             return "切换到混动模式";                                                          // hybrid (混动)
         if (s.contains("сохран") && s.contains("заряд")) return "切换到保电模式";
         if (s.contains("рекупер") && (grade.length() > 0 || s.contains("слабее") || s.contains("сильнее")))
@@ -975,7 +1044,8 @@ final class Ru2Zh {
             if (s.contains("ниже") || grade.equals("MINUS") || minusWordOf(s)) return "悬架降低一点"; // SET_SUSP_HEIGHT
             return "悬架升高一点";
         }
-        if (s.contains("погрузк") || s.contains("погрузи")) return "打开轻松搬运模式";         // CARRY_GOODS_EASILY
+        if (s.contains("погрузк") && (s.contains("режим") || s.contains("включи") || s.contains("выключи")))
+            return (off ? "关闭" : "打开") + "轻松搬运模式";                                  // CARRY_GOODS_EASILY («надо карту погрузить» is talk)
         return null;
     }
 
@@ -1050,8 +1120,12 @@ final class Ru2Zh {
             return "换个主题";
         if (s.contains("обои") || s.contains("заставк")) return "换个壁纸";                   // SWITCH_WALLPAPER
         if (s.contains("голос") && (s.contains("смени") || s.contains("друго"))) return "换个声音"; // SWITCH_VOICE_TONE
-        if (s.contains("мужск") && s.contains("голос")) return "换成男声";                    // SET_VOICE_TONE
-        if (s.contains("женск") && s.contains("голос")) return "换成女声";
+        boolean voiceCmd = s.trim().split("\\s+").length <= 3 || s.contains("смени") || s.contains("поставь")
+            || s.contains("включи") || s.contains("сделай") || s.contains("переключи") || s.contains("выбери");
+        if (voiceCmd && !s.contains("если") && !s.contains("значит")) {                       // «если голос женский, значит это Светлана» is talk
+            if (s.contains("мужск") && s.contains("голос")) return "换成男声";                // SET_VOICE_TONE
+            if (s.contains("женск") && s.contains("голос")) return "换成女声";
+        }
         if (s.contains("слово пробужден") || s.contains("слово активац")) return "修改唤醒词"; // SET_WAKE_WORD
         if (s.contains("без пробужден") || s.contains("свободное общение"))
             return (off ? "关闭" : "打开") + "免唤醒";                                        // OP_NON_WUW
@@ -1303,8 +1377,15 @@ final class Ru2Zh {
             if (s.contains("продолж") || s.contains("играй")) return "播放";                   // проверено на авто: 播放 запускает проигрыватель
             if ((s.contains("включи") || s.contains("вруб") || s.contains("поставь") || s.contains("запусти")
                  || s.contains("давай") || s.contains("послушать") || s.contains("послушаем") || s.contains("хочу"))
-                && (s.contains("музы") || s.contains("музон")))
-                return "播放";  // проверено на авто: голое 播放 запускает проигрыватель (оффлайн)
+                && (s.contains("музы") || s.contains("музон"))) {
+                // «включи музыку григорий лепс» names an artist: bare 播放 would resume whatever was playing.
+                // Anything after the word «музыку» beyond a filler → the backend (opens the music app with a search).
+                String tail = s.replaceFirst("^.*?(музы|музон)\\S*", "")            // verb-final order: «музыку включи»
+                    .replaceAll("(?<![а-я])(включи|включай|вруби|врубай|поставь|запусти|давай|хочу|послушать|послушаем|отправь)(?![а-я])", " ").trim();
+                if (!tail.isEmpty() && !tail.matches("((пожалуйста|мне|нам|уже|снова|опять|давай|погромче|потише|громче|тише|в машине|в салоне|какую-нибудь|любую)\\s*)+"))
+                    return null;
+                return "播放";
+            }  // проверено на авто: голое 播放 запускает проигрыватель (оффлайн)
             String w = s.trim();
             if (w.equals("музыку") || w.equals("музыка") || w.equals("музычку")) return "播放"; // bare "музыку!"
             if (w.matches("(включи|поставь|запусти|давай|вруби|включай) (песню|песенку|песни|музон|трек|что-нибудь)")) return "播放"; // unnamed
@@ -1323,6 +1404,8 @@ final class Ru2Zh {
             return "1倍速播放";
         }
         if (s.contains("радио")) {
+            if (!FM_RADIO_OFFLINE && off && !s.contains("частот")) return "暂停";   // «выключи радио» = stop what is playing (works offline)
+            if (!FM_RADIO_OFFLINE) return null;   // no FM intent on the A06 → backend opens the radio/music app («европа плюс», «радио онлайн»)
             if (n > 0 && (s.contains("частот") || s.contains("волн") || s.contains("fm"))) return "收音机调到" + n + "兆赫"; // OP_RADIO_HARDWARE
             return off ? "关闭收音机" : "打开收音机";
         }
@@ -1516,6 +1599,11 @@ final class Ru2Zh {
             else if (t.startsWith("восемь")) v = 8;
             else if (t.startsWith("девять")) v = 9;
             else if (t.startsWith("десять")) v = 10;
+            if (v >= 20 && v <= 90 && t.length() > 8) {               // «двадцатьшесть», «тридцатьдва» written as one word
+                String[] u = {"один", "одна", "два", "две", "три", "четыре", "пять", "шесть", "семь", "восемь", "девять"};
+                int[] uv = {1, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9};
+                for (int k = 0; k < u.length; k++) if (t.endsWith(u[k]) && t.length() > u[k].length() + 4) { v += uv[k]; break; }
+            }
             if (v >= 0) {
                 if (total < 0) total = v;
                 else if (total % 10 == 0 && v < 10) total += v;   // "двадцать" + "три" -> 23
