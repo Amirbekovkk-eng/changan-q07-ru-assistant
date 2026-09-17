@@ -59,9 +59,11 @@ public final class GigaAsr {
             if (appCtx == null) return false;
             File dir = new File(appCtx.getFilesDir(), ASSET_DIR);
             File onnx = new File(dir, MODEL), toks = new File(dir, TOKENS);
-            if (!onnx.exists() || !toks.exists()) {
-                Log.i(TAG, "unpacking GigaAM assets to " + dir + " (~224 MB, one-time)");
+            if (needsUnpack(dir, onnx, toks)) {
+                Log.i(TAG, "unpacking GigaAM assets to " + dir + " (~224 MB)");
+                deleteRec(dir);
                 unpackAssets(ASSET_DIR, dir);
+                writeText(new File(dir, SIG), assetsSig());
             }
             multilingual = vocabHasLatin(toks);
             Log.i(TAG, "vocabulary: " + (multilingual ? "multilingual (ru/kk/ky/uz/en)" : "russian (v3)"));
@@ -91,6 +93,50 @@ public final class GigaAsr {
 
     /** Multilingual build (GigaAM-Multilingual CTC)? Only meaningful once the recognizer is ready. */
     public static boolean multilingual() { return multilingual; }
+
+    // `pm install -r` keeps filesDir. A plain "files exist" check therefore left the PREVIOUS build's model in
+    // place: the multilingual APK installed over the Russian one kept running GigaAM-v3 with the v3 tokens
+    // (and reported itself as Russian). Same trap TeraTts had. The unpacked set is now tied to the bundled one
+    // by a signature — name:size of each asset (cheap: openFd length, the assets are zip-stored).
+    private static final String SIG = ".sig";
+
+    private static boolean needsUnpack(File dir, File onnx, File toks) {
+        if (!onnx.exists() || !toks.exists()) return true;
+        String want = assetsSig();
+        if (want.isEmpty()) return false;                       // asset sizes unavailable → trust what is on disk
+        String have = readText(new File(dir, SIG));
+        if (want.equals(have)) return false;
+        Log.i(TAG, "model signature changed: apk=" + want + " disk=" + have);
+        return true;
+    }
+
+    private static String assetsSig() {
+        long m = assetLen(ASSET_DIR + "/" + MODEL), t = assetLen(ASSET_DIR + "/" + TOKENS);
+        return (m < 0 || t < 0) ? "" : MODEL + ":" + m + "|" + TOKENS + ":" + t;
+    }
+
+    private static long assetLen(String path) {
+        try { android.content.res.AssetFileDescriptor fd = appCtx.getAssets().openFd(path);
+              long n = fd.getLength(); fd.close(); return n; }
+        catch (Throwable t) { return -1; }
+    }
+
+    private static void deleteRec(File f) {
+        try { if (f.isDirectory()) { File[] ch = f.listFiles(); if (ch != null) for (File c : ch) deleteRec(c); }
+              f.delete(); } catch (Throwable ignored) {}
+    }
+
+    private static String readText(File f) {
+        try { byte[] b = new byte[(int) f.length()]; java.io.FileInputStream in = new java.io.FileInputStream(f);
+              int off = 0, n; while (off < b.length && (n = in.read(b, off, b.length - off)) > 0) off += n; in.close();
+              return new String(b, 0, off, "UTF-8"); }
+        catch (Throwable t) { return ""; }
+    }
+
+    private static void writeText(File f, String s) {
+        try { FileOutputStream o = new FileOutputStream(f); o.write(s.getBytes("UTF-8")); o.close(); }
+        catch (Throwable t) { Log.e(TAG, "writeText", t); }
+    }
 
     /** tokens.txt lines are "<char> <id>"; the multilingual vocabulary has a-z, the v3 one doesn't. */
     private static boolean vocabHasLatin(File tokens) {
