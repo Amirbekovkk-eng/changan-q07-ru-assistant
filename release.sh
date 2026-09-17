@@ -10,7 +10,9 @@ set -euo pipefail
 HERE="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 VER="${1:?version, e.g. 1.0.3}"; SRC="${2:-$HERE/SpeechAssistant.orig.apk}"
 TAG="v$VER"
-# Two APKs per release: Russian-only ASR (GigaAM-v3) and multilingual ASR (GigaAM-Multilingual).
+# The Russian APK is always published. The multilingual one (GigaAM-Multilingual) only with WITH_MULTI=1:
+# it is still being debugged on the car (v1.1.0 shipped without it), so it must be an explicit decision.
+WITH_MULTI="${WITH_MULTI:-0}"
 NAME="speechassistant-ru-$TAG.apk";       OUT="$HERE/out/$NAME"
 NAME_ML="speechassistant-multi-$TAG.apk"; OUT_ML="$HERE/out/$NAME_ML"
 
@@ -21,10 +23,14 @@ echo "[release] building $NAME"
 VARIANT=ru "$HERE/build.sh" "$SRC" "$OUT"
 ( cd "$HERE/out" && shasum -a 256 "$NAME" > "$NAME.sha256" )
 echo "[release] $(du -h "$OUT" | cut -f1)  sha256: $(cut -d' ' -f1 "$OUT.sha256")"
-echo "[release] building $NAME_ML"
-VARIANT=multi "$HERE/build.sh" "$SRC" "$OUT_ML"
-( cd "$HERE/out" && shasum -a 256 "$NAME_ML" > "$NAME_ML.sha256" )
-echo "[release] $(du -h "$OUT_ML" | cut -f1)  sha256: $(cut -d' ' -f1 "$OUT_ML.sha256")"
+ASSETS="$OUT $OUT.sha256"
+if [ "$WITH_MULTI" = "1" ]; then
+  echo "[release] building $NAME_ML"
+  VARIANT=multi "$HERE/build.sh" "$SRC" "$OUT_ML"
+  ( cd "$HERE/out" && shasum -a 256 "$NAME_ML" > "$NAME_ML.sha256" )
+  echo "[release] $(du -h "$OUT_ML" | cut -f1)  sha256: $(cut -d' ' -f1 "$OUT_ML.sha256")"
+  ASSETS="$ASSETS $OUT_ML $OUT_ML.sha256"
+fi
 
 echo "[release] tests"
 sh "$HERE/ru2zh/translate-task/tests/run_tests.sh" | tail -1
@@ -46,12 +52,19 @@ adb shell am force-stop com.incall.apps.speechassistant
 \`\`\`
 Wake with «нихао» or the steering-wheel key. Command list: COMMANDS.md. Revert: \`adb shell pm uninstall com.incall.apps.speechassistant\`.
 
-\`$NAME\` — Russian ASR (GigaAM-v3). SHA-256: $(cut -d' ' -f1 "$OUT.sha256")
-\`$NAME_ML\` — multilingual ASR: Russian, Kazakh, Kyrgyz, Uzbek, English (GigaAM-Multilingual); non-Russian phrases are answered by the backend in the same language. SHA-256: $(cut -d' ' -f1 "$OUT_ML.sha256")"
+SHA-256: $(cut -d' ' -f1 "$OUT.sha256")"
 
-if gh release view "$TAG" -R "$(git -C "$HERE" remote get-url origin)" >/dev/null 2>&1; then
-  gh release upload "$TAG" "$OUT" "$OUT.sha256" "$OUT_ML" "$OUT_ML.sha256" --clobber
-else
-  gh release create "$TAG" "$OUT" "$OUT.sha256" "$OUT_ML" "$OUT_ML.sha256" --title "$TAG" --notes "$NOTES"
-fi
+REPO="$(git -C "$HERE" remote get-url origin)"
+gh release view "$TAG" -R "$REPO" >/dev/null 2>&1 \
+  || gh release create "$TAG" -R "$REPO" --draft --verify-tag --title "$TAG" --notes "$NOTES"
+# Assets one by one with retries: GitHub answers 5xx on ~900 MB uploads now and then, and
+# `gh release create <files>` deletes its own draft when that happens (seen on v1.1.0).
+for f in $ASSETS; do
+  n=0
+  until gh release upload "$TAG" "$f" -R "$REPO" --clobber; do
+    n=$((n+1)); [ $n -ge 4 ] && { echo "[release] upload failed: $f"; exit 1; }
+    echo "[release] retry $n: $(basename "$f")"; sleep 30
+  done
+done
+gh release edit "$TAG" -R "$REPO" --draft=false --latest
 echo "[release] done: $(gh release view "$TAG" --json url -q .url)"

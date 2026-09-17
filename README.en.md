@@ -80,8 +80,8 @@ patched app installs as a normal system‑app update **without root**.
 
 The built APK is not kept in git (~930 MB, contains the patched stock app); it is published under
 [Releases](https://github.com/voronoff2803/changan-a06-ru-assistant/releases): download
-`speechassistant-ru-vX.Y.Z.apk` (Russian only) or `speechassistant-multi-vX.Y.Z.apk` (Russian + Kazakh +
-Kyrgyz + Uzbek + English), check the `.sha256`, install as below.
+`speechassistant-ru-vX.Y.Z.apk`, check the `.sha256`, install as below. The multilingual build (`multi`) is
+not published yet — it is still being debugged on the car; it can be built from source.
 
 Maintainer: `./release.sh 1.0.5 ./SpeechAssistant.orig.apk` builds, runs the tests, tags `v1.0.5` and
 uploads the APK with `gh`. Or push a `v*` tag and let `.github/workflows/release.yml` build and attach
