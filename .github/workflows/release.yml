@@ -3,7 +3,8 @@ name: release
 # The stock SpeechAssistant.apk is proprietary and the two big models are not in git, so the
 # workflow downloads them from PRIVATE URLs kept in repository secrets:
 #   STOCK_APK_URL       — direct download URL of SpeechAssistant.orig.apk (e.g. a private release asset URL with token)
-#   GIGAAM_MODEL_URL    — stand/asr-android/gigaam/model.int8.onnx
+#   GIGAAM_MODEL_URL    — stand/asr-android/gigaam/model.int8.onnx (GigaAM-v3, Russian)
+#   GIGAAM_ML_MODEL_URL — stand/asr-android/gigaam-ml/model.int8.onnx (GigaAM-Multilingual: ru/kk/ky/uz/en)
 #   TERA_SAMPLER_URL    — tools/tera-tts-java/assets/models/sampler_distilled_cfg3_4step.onnx
 # Trigger: push a tag v*  (git tag v1.0.3 && git push origin v1.0.3)  or run manually.
 on:
@@ -29,24 +30,28 @@ jobs:
         env:
           STOCK_APK_URL: ${{ secrets.STOCK_APK_URL }}
           GIGAAM_MODEL_URL: ${{ secrets.GIGAAM_MODEL_URL }}
+          GIGAAM_ML_MODEL_URL: ${{ secrets.GIGAAM_ML_MODEL_URL }}
           TERA_SAMPLER_URL: ${{ secrets.TERA_SAMPLER_URL }}
         run: |
           set -e
-          for v in STOCK_APK_URL GIGAAM_MODEL_URL TERA_SAMPLER_URL; do
+          for v in STOCK_APK_URL GIGAAM_MODEL_URL GIGAAM_ML_MODEL_URL TERA_SAMPLER_URL; do
             [ -n "${!v}" ] || { echo "::error::secret $v is not set (see .github/workflows/release.yml)"; exit 1; }
           done
           curl -fsSL "$STOCK_APK_URL"    -o SpeechAssistant.orig.apk
           curl -fsSL "$GIGAAM_MODEL_URL" -o stand/asr-android/gigaam/model.int8.onnx
+          curl -fsSL "$GIGAAM_ML_MODEL_URL" -o stand/asr-android/gigaam-ml/model.int8.onnx
           curl -fsSL "$TERA_SAMPLER_URL" -o tools/tera-tts-java/assets/models/sampler_distilled_cfg3_4step.onnx
-          ls -la SpeechAssistant.orig.apk stand/asr-android/gigaam/model.int8.onnx tools/tera-tts-java/assets/models/sampler_distilled_cfg3_4step.onnx
+          ls -la SpeechAssistant.orig.apk stand/asr-android/gigaam/model.int8.onnx stand/asr-android/gigaam-ml/model.int8.onnx tools/tera-tts-java/assets/models/sampler_distilled_cfg3_4step.onnx
       - name: tests
         run: sh ru2zh/translate-task/tests/run_tests.sh
       - name: build
         run: |
           TAG="${{ github.event.inputs.tag || github.ref_name }}"
           echo "TAG=$TAG" >> "$GITHUB_ENV"
-          ./build.sh ./SpeechAssistant.orig.apk "out/speechassistant-ru-$TAG.apk"
+          VARIANT=ru    ./build.sh ./SpeechAssistant.orig.apk "out/speechassistant-ru-$TAG.apk"
+          VARIANT=multi ./build.sh ./SpeechAssistant.orig.apk "out/speechassistant-multi-$TAG.apk"
           ( cd out && sha256sum "speechassistant-ru-$TAG.apk" > "speechassistant-ru-$TAG.apk.sha256" )
+          ( cd out && sha256sum "speechassistant-multi-$TAG.apk" > "speechassistant-multi-$TAG.apk.sha256" )
           ls -la out
       - name: publish release
         uses: softprops/action-gh-release@v2
@@ -56,6 +61,8 @@ jobs:
           files: |
             out/speechassistant-ru-${{ env.TAG }}.apk
             out/speechassistant-ru-${{ env.TAG }}.apk.sha256
+            out/speechassistant-multi-${{ env.TAG }}.apk
+            out/speechassistant-multi-${{ env.TAG }}.apk.sha256
           body: |
             Russian voice assistant mod for Changan A06 (C390).
 
@@ -66,3 +73,5 @@ jobs:
             adb shell am force-stop com.incall.apps.speechassistant
             ```
             Wake with «нихао» or the steering-wheel key. Commands: COMMANDS.md. Revert: `adb shell pm uninstall com.incall.apps.speechassistant`.
+
+            `speechassistant-ru-*.apk` — Russian ASR (GigaAM-v3). `speechassistant-multi-*.apk` — multilingual ASR: Russian, Kazakh, Kyrgyz, Uzbek, English (GigaAM-Multilingual); non-Russian phrases are answered by the backend in the same language.

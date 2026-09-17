@@ -1,0 +1,1044 @@
+# Uzbek (Latin, as GigaAM-Multilingual writes it) → the SAME Chinese commands as tests.tsv, line for line.
+# Format: phrase<TAB>expected_ZH[<TAB>UNSAFE|DIR=n]; NULL = must NOT be a command.
+# klimat
+konditsionerni yoq	打开制冷模式
+klimatni o'chir	关闭空调
+yo'lovchiga konditsionerni yoq	打开副驾空调
+haroratni 24 qil	把温度调到24度
+harorat yigirma to'rt daraja	把温度调到24度
+issiqroq qil	温度调高一点
+sovuqroq qil	温度调低一点
+haroratni maksimumga	温度调到最高
+yo'lovchiga haroratni 22	把副驾温度调到22度
+haroratni sinxronla	温度同步
+shamolni uchga qo'y	风量调到3档
+shamolni kuchliroq qil	风量调大一点
+shamolni kuchsizroq qil	风量调小一点
+ventilyatorni maksimumga	风量调到最大
+yuzga pufla	空调吹面
+oyoqqa pufla	空调吹脚
+yuzga va oyoqqa pufla	空调吹面吹脚
+resirkulyatsiyani yoq	打开内循环
+resirkulyatsiyani o'chir	打开外循环
+havo aylanishini almashtir	切换内外循环
+klimatni avto rejimga	打开空调自动模式
+konditsionerni sovutish rejimiga	打开制冷模式
+konditsionerni isitish rejimiga	打开制热模式
+old oynani isitishni yoq	打开前挡除霜
+orqa oynani isitishni o'chir	关闭后挡除霜
+aromatizatorni yoq	打开香氛
+aromatni almashtir	换个香氛
+# oynalar
+oynani och	打开主驾车窗
+oynani tushir	打开主驾车窗
+oynani yop	关闭主驾车窗
+oynani ko'tar	关闭主驾车窗
+hamma oynalarni och	打开所有车窗
+oynani yarim och	主驾车窗开一半
+oynani o'ttiz foizga och	主驾车窗开到百分之30
+oynani sal och	主驾车窗留缝
+orqa o'ng oynani och	打开后排右车窗
+orqa o'ng yo'lovchiga oynani och	打开后排右车窗
+orqadagi o'ngdagi yo'lovchiga oynani och	打开后排右车窗
+orqa chap oynani och	打开后排左车窗
+haydovchi orqasidagi oynani och	打开后排左车窗
+old oynalarni och	打开前排车窗
+oynalar qulfini yoq	打开车窗锁
+yomg'irda oynalarni yop	打开雨天自动关窗
+lyukni och	打开天窗
+lyukni yop	关闭天窗
+pardani yop	关闭遮阳帘
+oynalardagi pardalarni och	打开车窗遮阳帘
+hammasini och	一键全开
+hammasini yop	一键全关
+# o'rindiqlar
+o'rindiq isitishni yoq	打开主驾座椅加热
+yo'lovchi o'rindig'ini isitish	打开副驾座椅加热
+o'rindiq isitishni ikkiga	主驾座椅加热2档
+o'rindiqni issiqroq qil	主驾座椅加热调高一点
+o'rindiq isitishni maksimumga	主驾座椅加热调到最高
+o'rindiq isitishni o'chir	关闭主驾座椅加热
+o'rindiq shamollatishni yoq	打开主驾座椅通风
+o'rindiq shamollatishni uchga	主驾座椅通风3档
+massajni yoq	打开主驾座椅按摩
+massajni kuchliroq qil	按摩强度调大一点
+boshqa massaj rejimi	换个按摩模式
+belni balandroq	腰部支撑调高一点
+o'rindiq suyanchig'ini orqaga	主驾座椅靠背角度调大一点
+o'rindiq yostig'ini balandroq	主驾座椅坐垫调高一点
+o'rindiqni oldinga	主驾座椅往前调一点
+o'rindiqni orqaga	主驾座椅往后调一点
+o'rindiqni ko'tar	主驾座椅位置调高一点
+o'rindiqni tushir	主驾座椅位置调低一点
+o'rindiq holatini eslab qol	保存当前座椅位置
+yo'lovchi vip rejimini yoq	打开尊享副驾
+# yorug'lik
+podsvetkani yoq	打开氛围灯
+podsvetkani o'chir	关闭氛围灯
+podsvetkani ko'k qil	氛围灯调成蓝色
+podsvetkani yorqinroq qil	氛围灯调亮一点
+podsvetkani xiraroq qil	氛围灯调暗一点
+podsvetkaning boshqa rangi	氛围灯换个颜色
+podsvetka effektini almashtir	氛围灯换个灯效
+yorug'lik shousini yoq	打开音乐灯光秀
+uzoq nurni yoq	打开远光灯
+yaqin nurni yoq	打开近光灯
+faralarni yoq	打开近光灯
+avariyani yoq	打开双闪
+tuman chiroqlarini yoq	打开雾灯
+gabaritlarni yoq	打开示廓灯	FIELD_OFF
+orqa chiroqlarni yoq	打开尾灯
+salondagi chiroqni yoq	打开车内所有灯光
+chiroqni yoq	打开车内所有灯光
+chiroqni o'chir	关闭车内所有灯光
+yukxona chirog'ini yoq	打开后备箱灯
+# ko'zgular rul tozalagichlar
+ko'zgular isitishini yoq	打开后视镜加热
+ko'zgularni yig'	折叠后视镜
+ko'zgularni yoy	展开后视镜
+ko'zguni yuqoriga	后视镜向上调一点
+rulni balandroq	方向盘调高一点
+rulni yengilroq qil	转向调到轻便模式
+rul isitishini yoq	打开方向盘加热
+rul isitishini ikkiga	方向盘加热调到2档
+oynani yuv	喷水洗玻璃
+tozalagichlarni yoq	打开雨刮	FIELD_OFF
+tozalagichlarni uchga	雨刮调到3档
+tozalagichlarni tezroq	雨刮快一点
+yomg'ir sensori sezgirligini balandroq	雨刮灵敏度调高一点
+# HUD ekranlar
+proyeksiyani yoq	打开抬头显示
+proyeksiyani balandroq	HUD高度调高一点
+proyeksiya yorqinligini balandroq	HUD亮度调高一点
+ekranni yorqinroq qil	屏幕调亮一点
+ekranni xiraroq qil	屏幕调暗一点
+ekran yorqinligini maksimumga	屏幕亮度调到最大
+ekran avtoyorqinligini yoq	打开自动亮度
+ekranda ko'z himoyasini yoq	打开护眼模式
+ekranni tungi rejimga	切换到夜间模式
+ekranni so'ndir	息屏
+ekranni uyg'ot	亮屏
+ekranni o'chir	关闭屏幕
+shriftni kattaroq qil	字体调大一点
+# ovoz media
+ovozni o'chir	静音
+ovozni yoq	取消静音
+ovozni yigirmaga	音量调到20
+ovozni balandroq qil	声音调大一点
+ovozni pastroq qil	声音调小一点
+ovozni maksimumga	音量调到最大
+keyingi trek	下一首
+oldingi qo'shiq	上一首
+musiqani yoq	播放
+musiqani pauzaga qo'y	暂停
+musiqani davom ettir	播放
+musiqani o'chir	暂停
+bu qo'shiq yoqdi	收藏这首歌
+bu qo'shiqni yuklab ol	下载这首歌
+bu qanday qo'shiq	这是什么歌
+qo'shiq matnini ko'rsat	打开歌词
+qo'shiqni takrorla	单曲循环
+musiqani aralashtir	随机播放
+o'ttiz soniya oldinga o'tkaz	快进30秒
+orqaga o'tkaz	快退15秒
+radioni yoq	打开收音机	FIELD_OFF
+manba blyutus	切换到蓝牙音乐
+pleylistni och	打开播放列表
+ovozni haydovchiga	音场切换到主驾
+# rejimlar
+sport rejimi	切换到运动模式	FIELD_OFF
+eko rejim	切换到经济模式	FIELD_OFF
+komfort rejimi	切换到舒适模式	FIELD_OFF
+rekuperatsiyani kuchliroq qil	能量回收调强一点
+osmani yumshoqroq qil	悬架调软一点
+osmani balandroq	悬架升高一点
+osmani tekisla	一键调平
+kino rejimini yoq	打开影院模式
+kemping rejimi	打开后舱露营
+qo'riqlash rejimini yoq	打开哨塔模式
+maxfiy rejim	打开隐私模式
+yigirma daqiqa uxlamoqchiman	我要睡20分钟
+muzlatgichni yoq	打开车载冰箱
+muzlatgichni sovuqroq qil	车载冰箱温度调低一点
+muzlatgich eshikchasini yop	关闭冰箱门
+kamar eslatmasini yoq	打开安全带未系提醒
+mavzuni almashtir	换个主题
+fon rasmini almashtir	换个壁纸
+ovozni almashtir	换个声音
+ayol ovozi	换成女声
+# tarmoq kameralar
+blyutusni yoq	打开蓝牙
+vayfayni yoq	打开WiFi
+ulanish nuqtasini yoq	打开热点
+simsiz zaryadlashni yoq	打开无线充电
+suratga ol	拍照
+video ol	拍个视频
+registrator yozishni boshla	行车记录仪开始录像
+aylanma ko'rinishni yoq	打开360全景影像
+# navigatsiya
+navigatsiyani yoq	NULL
+navigatsiyani o'chir	NULL
+navigatsiya ovozini balandroq qil	导航音量调大一点
+uyga ketdik	NULL
+uyga	NULL
+ishga ketdik	NULL
+aeroportga ketdik	NULL
+zapravkani top	NULL
+yo'lda zapravkani top	NULL
+parkovkani top	NULL
+biz qayerdamiz	NULL
+qancha yuramiz	NULL
+oldinda tirbandlik	NULL
+xaritani yaqinlashtir	NULL
+xaritani sputnikga	NULL
+xaritani och	打开地图
+xaritani yop	NULL
+butun marshrutni ko'rsat	NULL
+pullik yo'llarsiz	NULL
+tirbandlikni aylanib o't	NULL
+# telefon
+onamga qo'ng'iroq qil	给onam打电话
+yana bir marta qo'ng'iroq qil	重拨
+qayta qo'ng'iroq qil	回拨
+javob ber	接听
+qo'ng'iroqni tashla	挂断
+rad et	拒接
+qo'ng'iroqlar tarixini och	打开通话记录
+kontaktlarni och	打开通讯录
+kontaktlarni sinxronla	同步通讯录
+# holat uy UI
+qancha zaryad qoldi	还有多少电
+shinalar bosimi	胎压是多少
+probeg qancha	现在的里程是多少
+uydagi konditsionerni yoq	打开家里的空调
+uydagi chiroqni yoq	打开家里的灯
+uydagi changyutgichni ishga tushir	让扫地机器人开始打扫
+asosiy ekranga	返回桌面
+ket	退下
+galereyani och	打开相册
+sozlamalarni och	打开设置
+podsvetka sozlamalarini och	打开氛围灯设置
+musiqani och	打开音乐
+kamerani och	打开相机
+ha	确认
+yo'q	不用了
+orqaga	返回
+davom et	继续
+pauza	暂停
+keyingisi	下一个
+ikkinchisini tanla	第2个
+uchinchi sahifa	第3页
+varaqla	下一页
+sevimlilarga	收藏
+# bulut -> null
+ob-havo qanday	NULL
+latifa aytib ber	NULL
+mening ismim aleksey	NULL
+# unsafe
+yukxonani och	打开后备箱	UNSAFE
+yukxonani yop	关闭后备箱	UNSAFE
+kapotni och	打开前备箱	UNSAFE
+eshiklarni qulfla	锁车	UNSAFE
+eshiklarni qulfdan chiqar	解锁	UNSAFE
+mashinani qulfla	锁车	UNSAFE
+eshikni och	打开主驾车门	UNSAFE
+kruizni yoq	打开自适应巡航	UNSAFE
+kruizni yuzga	巡航速度调到100	UNSAFE
+avtopilotni yoq	打开自动驾驶	UNSAFE
+masofani kattaroq qil	跟车距离调大一点	UNSAFE
+chapga o't	向左变道	UNSAFE
+yo'lakni saqla	保持车道行驶	UNSAFE
+to'xtab qo'y	帮我泊车	UNSAFE
+mashinani chaqir	语音召唤	UNSAFE
+# xavfsiz qo'shnilar
+bolalar qulfini yoq	打开儿童锁
+zaryadlash qopqog'ini och	打开充电口盖
+benzin baki qopqog'ini och	打开油箱盖
+yaqinlashganda ochilishni yoq	打开近车自动解锁
+# regress
+qo'riqlashda oynalarni yop	打开锁车关窗
+yomg'irda oynalar yopilishini o'chir	关闭雨天自动关窗
+kreslolar isitishi	打开主驾座椅加热
+oldingi ekranga qayt	返回上一页
+tozalagichlar sezgirligini pastroq	雨刮灵敏度调低一点
+blyutus musiqani yoq	切换到蓝牙音乐
+hamma oynalar pardalarini yop	关闭车窗遮阳帘
+uydagi chiroqni o'chir	关闭家里的灯
+# so'zlashuv shakllari
+menga sovuq	温度调高一点
+men muzlab ketdim	温度调高一点
+issiq	温度调低一点
+dim	温度调低一点
+ikki darajaga issiqroq qil	温度调高2度
+uch darajaga sovuqroq qil	温度调低3度
+kondeyni yoq	打开制冷模式
+konditsionerni o'chir	关闭制冷模式
+ovozni kamaytir	声音调小一点
+ovozni oshir	声音调大一点
+ovozni pastroq qil	声音调小一点
+yigirma ikki daraja qo'y	把温度调到22度
+haydovchi oynasini och	打开主驾车窗
+yo'lovchi oynasini och	打开副驾车窗
+orqa oynani och	打开后排车窗
+oyna ko'targichlarni blokla	打开车窗锁
+89031234567 raqamiga qo'ng'iroq qil	拨打89031234567
+112 ga qo'ng'iroq qil	拨打112
+pauzaga qo'y	暂停
+qo'shiqni almashtir	下一首
+musiqani to'xtat	暂停
+orqa kamera	打开360全景影像
+kreslolar isitishini maksimumga	主驾座椅加热调到最高
+# yolg'on ishga tushishlar
+rekuperatsiya nima	NULL
+sen nima qila olasan	NULL
+ertak aytib ber	NULL
+ishlaring qalay	NULL
+rahmat	NULL
+soat necha	NULL
+rekuperatsiyani kuchsizroq qil	能量回收调弱一点
+oynalar terlab ketdi	打开前挡除霜
+oynalar terlayapti	打开前挡除霜
+ovozni nolga	音量调到0
+ovozni qirqqa	音量调到40
+harorat qirq	NULL
+oyna ko'targichlarni blokdan chiqar	关闭车窗锁
+# so'z tartibi va muloyim o'ramlar
+oynani och	打开主驾车窗
+iltimos oynani och	打开主驾车窗
+eshiting iltimos oynani oching	打开主驾车窗
+podsvetkani o'chir	关闭氛围灯
+tozalagichlarni yoq	打开雨刮	FIELD_OFF
+# shisha = oyna
+shishani tushir	打开主驾车窗
+shishani ko'tar	关闭主驾车窗
+haydovchi shishasini tushir	打开主驾车窗
+o'ng shishani tushir	打开副驾车窗
+chap shishani tushir	打开主驾车窗
+o'ng old oynani och	打开副驾车窗
+oynalarni blokla	打开车窗锁
+# pechka / shamollatish / shikoyatlar
+pechkani yoq	打开制热模式
+pechkani o'chir	关闭空调
+pechkani issiqroq qil	温度调高一点
+salonni isit	打开制热模式
+salonni sovut	打开制冷模式
+salonni shamollat	打开外循环
+# inkorlar — hech narsa qilinmasin
+oynani yopma	NULL
+musiqani yoqma	NULL
+konditsionerni o'chirma	NULL
+yukxonani ochma	NULL
+kerak emas	不用了
+bezovta qilmaslik rejimini yoq	打开勿扰模式
+# isitish: fe'l shakllari
+o'rindiqni isit	打开主驾座椅加热
+o'rindiqni qizdir	打开主驾座椅加热
+ko'zgularni isit	打开后视镜加热
+rulni isit	打开方向盘加热
+orqa o'rindiqlar isitishi	打开后排座椅加热
+rul va o'rindiq isitishini yoq	打开主驾座椅加热
+# yorug'lik
+uzoq nurni yoq	打开远光灯
+uzoq nurni o'chir	关闭远光灯
+yaqin nurni yoq	打开近光灯
+podsvetkani xiraroq	氛围灯调暗一点
+chiroqni xiraroq qil	氛围灯调暗一点
+# media: so'zlashuv
+musiqani qo'y	播放
+musiqani boshla	播放
+musiqacha qo'y	播放
+musiqa to'xta	暂停
+qo'shiq qo'y	播放
+boshidan qo'y	重新播放
+keyingi stansiya	下一首
+oldingi stansiya	上一首
+musiqani pastroq qil	音乐音量调小一点
+# nisbiy va mutlaq ovoz
+ovozni beshga oshir	声音调大一点
+ovozni ikkiga pasaytir	声音调小一点
+ovozni yigirmaga qo'y	音量调到20
+# boshqa
+zaryad darajasi qanday	还有多少电
+xaritani kattaroq	NULL
+xaritani kichikroq	NULL
+oynani art	打开雨刮	FIELD_OFF
+lyukni sal och	打开天窗
+pardani sal och	打开遮阳帘
+biroz issiqroq qil	温度调高一点
+peshtaxtani och	NULL
+sigaret yoq	NULL
+# oshir/pasaytir
+haroratni pasaytir	温度调低一点
+haroratni oshir	温度调高一点
+ovozni ko'paytir	声音调大一点
+ovozni kamaytir	声音调小一点
+shamolni kuchaytir	风量调大一点
+ekran yorqinligini kamaytir	屏幕调暗一点
+podsvetka yorqinligini kamaytir	氛围灯调暗一点
+osmani pasaytir	悬架降低一点
+ovozni olib tashla	静音
+# ekranlar
+yo'lovchi ekranini o'chir	关闭屏幕
+yo'lovchi ekrani qiyaligini balandroq	副驾屏幕角度调高一点
+ekranni aylantir	切换到横屏
+# yo'lda savollar
+hali uzoqmi	NULL
+hali ko'p yuramizmi	NULL
+batareya necha foiz	还有多少电
+eng yaqin zapravka qayerda	NULL
+ovqat yegim kelyapti	NULL
+kofe ichgim kelyapti	NULL
+hojatxonaga borishim kerak	NULL
+yoqilg'i quyish kerak	NULL
+zaryad kerak	NULL
+# eski shakllar
+musiqani o'chirib qo'y	暂停
+yo'lovchi oynasini yop	关闭副驾车窗
+oyna tozalagichlarni yoq	打开雨刮	FIELD_OFF
+hamma oynalarni yop	关闭所有车窗
+oynalarni yarim och	主驾车窗开一半
+yigirma daraja qo'y	把温度调到20度
+servisga qo'ng'iroq qil	给servis打电话
+# savollar va hikoyalar -> chat
+kruizdan qanday foydalanish kerak	NULL
+avtopilot xavflimi	NULL
+tozalagichlarni qachon almashtirish kerak	NULL
+sport yoki eko rejim qaysi yaxshi	NULL
+nega rul og'ir	NULL
+o'rindiq isitish qanday ishlaydi	NULL
+konditsionerlar haqida aytib ber	NULL
+havo resirkulyatsiyasi nima degani	NULL
+ekranni qanday tozalash kerak	NULL
+telefonimni qayerda qoldirdim	NULL
+qo'shnimning podsvetkasi zo'r	NULL
+kecha juda issiq edi	NULL
+bu mashina qancha turadi	NULL
+# guard qonuniy savollarni buzmasin
+qachon yetamiz	NULL
+biz qayerdamiz	NULL
+qancha yuramiz	NULL
+# --- tungi to'lqin: muzlatgich, yorug'lik, sinonimlar ---
+muzlatgichni och	打开冰箱门
+muzlatgichni yop	关闭冰箱门
+sovutgichni yoq	打开车载冰箱
+xolodilnikni o'chir	关闭车载冰箱
+muzlatgichni besh darajaga	把车载冰箱温度调到5度
+muzlatgich eshikchasini och	打开冰箱门
+chiroqni yoq	打开车内所有灯光
+chiroqni o'chir	关闭车内所有灯光
+chiroqni so'ndir	关闭车内所有灯光
+yorug'likni o'chir	关闭车内所有灯光
+chiroqni yondir	打开车内所有灯光
+yoritishni yoq	打开氛围灯
+salon yoritishini o'chir	关闭车内所有灯光
+lampani yoq	打开左前阅读灯
+lampochkani yoq	打开左前阅读灯
+salondagi chiroqni yoq	打开车内所有灯光
+lampani o'chir	关闭左前阅读灯
+ambient podsvetkani yoq	打开氛围灯
+neon podsvetkani yoq	打开氛围灯
+kunduzgi chiroqlarni yoq	打开位置灯	FIELD_OFF
+kunduzgi yurish chiroqlarini yoq	打开位置灯	FIELD_OFF
+tuman faralarini yoq	打开雾灯
+faralarni o'chir	关闭近光灯
+salqinroq qil	温度调低一点
+salonni sovut	打开制冷模式
+toza havo xohlayman	打开外循环
+juda kuchli puflayapti	风量调小一点
+kuchsiz puflayapti	风量调大一点
+isitishni yoq	打开主驾座椅加热
+mashinani isit	打开制热模式
+konditsioner isitishini yoq	打开制热模式
+isitgichni o'chir	关闭空调
+konditsionerni yigirma ikkiga	把温度调到22度
+kondeyni yoqib qo'y	打开制冷模式
+terlab ketdim	温度调低一点
+men terladim	温度调低一点
+sovqotib ketdim	温度调高一点
+menga pufla	空调吹面
+havoni oyoqqa yo'naltir	空调吹脚
+isitishni yoq	打开主驾座椅加热
+o'rindiq isitgichini yoq	打开主驾座椅加热
+yo'lovchiga isitishni	打开副驾座椅加热
+isitishni ikkiga	主驾座椅加热2档
+isitishni o'chir	关闭主驾座椅加热
+orqamni uqala	打开主驾座椅按摩
+o'rindiqni orqaga sur	主驾座椅往后调一点
+kresloni yaqinroq sur	主驾座椅往前调一点
+derazani och	打开主驾车窗
+derazalarni yop	关闭主驾车窗
+tomni och	打开天窗
+panoramali tomni yop	关闭天窗
+tomdagi pardani yop	关闭遮阳帘
+mashinani yop	锁车	UNSAFE
+mashinani och	解锁	UNSAFE
+mashinani qulflab qo'y	锁车	UNSAFE
+meni aeroportga olib bor	NULL
+markazga boramiz	NULL
+vokzalgacha navigator	NULL
+zapravka qayerda	NULL
+zapravkaga kiramiz	NULL
+uyga navigatsiya	NULL
+taksi chaqir	NULL
+onamga sim qoq	给onam打电话
+qo'shiqni almashtir	下一首
+boshqa qo'shiq qo'y	下一首
+musiqa qo'y	播放
+musiqa eshitmoqchiman	播放
+musiqa	播放
+ovozni to'la	音量调到最大
+ventilyatorni to'la	风量调到最大
+pechkani o'chirib qo'y	关闭空调
+musiqani o'chir	暂停
+avtopilotni o'chir	关闭自动驾驶	UNSAFE
+mening konditsionerim buzildi	NULL
+lampochka kuyib ketdi	NULL
+isitish ishlamayapti	NULL
+# --- 2-to'lqin: so'zlashuv ---
+mashinada sovuq	温度调高一点
+issiqlik kerak	温度调高一点
+issiqroq qil	温度调高一点
+sovuqroq qilib ber	温度调低一点
+shishani yuqoriga	关闭主驾车窗
+shishani pastga	打开主驾车窗
+signalizatsiyani yoq	打开哨塔模式
+signalizatsiyani o'chir	关闭哨塔模式
+tozalagichlarni maksimumga	雨刮快一点
+oynadagi tomchilarni art	打开雨刮	FIELD_OFF
+marshrutni to'xtat	NULL
+marshrutni bekor qil	NULL
+manzilgacha qancha qoldi	NULL
+necha kilometr qoldi	NULL
+musiqani qo'yib yubor	播放
+qo'ng'iroqni o'chir	挂断
+zaryad qanday	还有多少电
+telefonni zaryadla	打开无线充电
+uxlash rejimi	我要睡一会儿
+yarim soat mizg'imoqchiman	我要睡30分钟
+yigirma daqiqadan keyin uyg'ot	我要睡20分钟
+yo'lovchi shishasini tushir	打开副驾车窗
+hamma shishalarni ko'tar	关闭所有车窗
+ventilyatorni pastroq	风量调小一点
+musiqani pastroq	音乐音量调小一点
+uyga marshrut	NULL
+uyga olib bor	NULL
+tirbandlikni ko'rsat	NULL
+vayfay tarqat	打开热点
+trubkani ol	接听
+pardani och	打开遮阳帘
+orqa massajini yoq	打开主驾座椅按摩
+salon chirog'ini yoq	打开车内所有灯光
+ko'zgularni isit	打开后视镜加热
+rulni isit	打开方向盘加热
+telefonni simsiz zaryadlashga	打开无线充电
+# --- 3-to'lqin ---
+suyanchiqni tushir	主驾座椅靠背角度调大一点
+suyanchiqni orqaga yotqiz	主驾座椅靠背角度调大一点
+kresloni yotqiz	放倒主驾座椅靠背
+proyeksiyani yorqinroq	HUD亮度调高一点
+ekranni ag'dar	切换到横屏
+rang haroratini issiqroq	屏幕色温调暖一点
+sportga o't	切换到运动模式	FIELD_OFF
+qish rejimini yoq	切换到雪地模式	FIELD_OFF
+qattiq osma	悬架调硬一点
+yumshoq osma	悬架调软一点
+kamera uch yuz oltmish	打开360全景影像
+surat ol	拍照
+kameradan surat	拍照
+sevimli qo'shiqlarni ko'rsat	打开我的收藏
+tasodifiy tartib	随机播放
+qo'shiq yoqdi	收藏这首歌
+bu qo'shiq yoqmadi	取消收藏这首歌
+qo'shiqni saqla	收藏这首歌
+bu joyni saqla	NULL
+mashinani qo'riqlashga qo'y	打开哨塔模式
+park qil	帮我泊车	UNSAFE
+parkovkadan chiq	泊出	UNSAFE
+o'sha mashina orqasidan yur	跟着前车走	UNSAFE
+o'sha mashina orqasidan yurma	NULL
+registratordan video yoz	行车记录仪开始录像
+registratordan skrinshot	行车记录仪拍照
+yuklash rejimi	打开轻松搬运模式
+bezovta qilmaslikni yoq	打开勿扰模式
+karaoke xohlayman	打开K歌房模式
+# --- 4-to'lqin ---
+audiokitobni yoq	NULL
+rulni mahkamla	NULL
+masofani qisqartir	跟车距离调小一点	UNSAFE
+masofani kattaroq	跟车距离调大一点	UNSAFE
+yo'lak chapga	向左变道	UNSAFE
+zaryadni ko'rsat	还有多少电
+nima chalinyapti	这是什么歌
+internetni tarqat	打开热点
+videoni och	打开视频
+yopil	退下
+kresloni uxlash holatiga	打开大床模式
+karavotni yoy	打开大床模式
+orqa shishalarni blokla	打开车窗锁
+orqa pardalarni och	打开车窗遮阳帘
+pastroq gapir	语音音量调小一点
+podsvetkani binafsha qil	氛围灯调成紫色
+yo'lovchi ekranini egib qo'y	副驾屏幕角度调高一点
+# --- klimat vs konditsioner + qopqoqlar ---
+klimatni yoq	打开空调自动模式
+klimat-kontrolni yoq	打开空调自动模式
+konditsionerni yoq	打开制冷模式
+klimatni o'chir	关闭空调
+yo'lovchiga klimatni yoq	打开副驾空调
+zaryadlashni och	打开充电口盖
+zaryadlashni yop	关闭充电口盖
+bakni och	打开油箱盖
+bakni yop	关闭油箱盖
+benzin bakini och	打开油箱盖
+zaryadlash portini och	打开充电口盖
+# --- qulflar va avto-faralar ---
+qulfni yop	锁车	UNSAFE
+qulfla	锁车	UNSAFE
+qulfni och	解锁	UNSAFE
+faralarni avtomatik rejimga	打开自动近光灯
+avtomatik faralarni yoq	打开自动近光灯
+# --- media ovozi vs yordamchi ovozi ---
+musiqani balandroq	音乐音量调大一点
+qo'shiqni balandroq	音乐音量调大一点
+radioni pastroq	音乐音量调小一点
+musiqa ovozini yigirmaga	音乐音量调到20
+musiqani to'la	音乐音量调到最大
+balandroq gapir	语音音量调大一点
+chiroqlarni avtomatik rejimga	打开自动近光灯
+yaqin nurni avtomatik rejimga	打开自动近光灯
+avtomatik faralarni o'chir	关闭自动近光灯
+uzoq nurni avtomatik rejimga	打开自动远光灯
+mashinadagi chiroqni yoq	打开车内所有灯光
+# --- xalq iboralari ---
+og'izga pufla	空调吹面
+aftga pufla	空调吹面
+o'rindiq shamollatishini yoq	打开主驾座椅通风
+o'rindiq shamollatishini o'chir	关闭主驾座椅通风
+o'tirg'ichni isit	打开主驾座椅加热
+o'rindiq massajini yoq	打开主驾座椅按摩
+o'tirg'ich isitishini yoq	打开主驾座椅加热
+mashinada qattiq sovuq	温度调高一点
+qaltirayapman	温度调高一点
+bu yer jazirama	温度调低一点
+havo dim	温度调低一点
+davom et chal	播放
+# --- salon chirog'i joylashuv bilan ---
+salondagi butun chiroqni yoq	打开车内所有灯光
+salondagi butun chiroqni o'chir	关闭车内所有灯光
+o'ng orqa o'qish chirog'ini yoq	打开右后阅读灯
+yo'lovchiga lampani yoq	打开右前阅读灯
+orqada chiroqni yoq	打开后排阅读灯
+orqa chap yo'lovchiga chiroqni yoq	打开左后阅读灯
+hamma lampalarni o'chir	关闭车内所有灯光
+# --- kuchli sovutish/isitish, eko, havo tozalash ---
+salonni tez sovut	打开强力制冷模式
+mashinani zudlik bilan sovut	打开强力制冷模式
+salonni sovut	打开制冷模式
+mashinani tez isit	打开强力制热模式
+konditsionerni kuchli sovutishga	打开强力制冷模式
+konditsionerni tejamkor rejimga	打开空调节能模式
+havo tozalagichni yoq	打开空气净化
+havo tozalagichni o'chir	关闭空气净化
+uydagi havo tozalagichni yoq	打开家里的空气净化器
+# --- muzlatgich harorati ---
+muzlatgichni minus beshga	把车载冰箱温度调到零下5度
+muzlatgich harorati minus uch	把车载冰箱温度调到零下3度
+muzlatgichni 5 ga	把车载冰箱温度调到5度
+muzlatgichni issiqroq	车载冰箱温度调高一点
+muzlatgichni isitishga	车载冰箱调到加热模式
+oldinda chiroqni yoq	打开前排阅读灯
+muzlatgichni nol darajaga	把车载冰箱温度调到0度
+muzlatgichni 0 darajaga	把车载冰箱温度调到0度
+# --- demo ro'yxati ---
+yuz va oyoqqa pufla	空调吹面吹脚
+yuzga shamol	空调吹面
+qorong'i mavzuni yoq	切换到夜间模式
+yorug' mavzuni yoq	切换到白天模式
+ekranni menga qarat	NULL
+manzilgacha qancha yuramiz	NULL
+oldingi plafonni yoq	打开前排阅读灯
+yaqinda zaryadlash top	NULL
+panoramani och	打开天窗
+salonda oldingi chiroqni yoq	打开前排阅读灯
+muzlatgichni -5 ga	把车载冰箱温度调到零下5度
+oyoq va tanaga pufla	空调吹面吹脚
+tanaga pufla	空调吹面
+oyna va oyoqqa pufla	打开前挡除霜
+oynaga pufla	打开前挡除霜
+konditsionerni o'chir	关闭制冷模式
+klimatni butunlay o'chir	关闭空调
+# --- shamol kuchi ---
+shamolni kuchaytir	风量调大一点
+ventilyatorni tezroq	风量调大一点
+ventilyatorni sekinroq	风量调小一点
+havo oqimini kuchliroq	风量调大一点
+kuchsizroq pufla	风量调小一点
+shamolni to'la	风量调到最大
+# --- pog'onalar ---
+shamolni beshinchi pog'onaga	风量调到5档
+shamolni uchinchi pog'onaga	风量调到3档
+ventilyatorni ikkinchi pog'onaga	风量调到2档
+o'rindiq isitishini ikkinchi pog'onaga	主驾座椅加热2档
+o'rindiq isitishini uchinchi pog'onaga	主驾座椅加热3档
+o'rindiq shamollatishini birinchi pog'onaga	主驾座椅通风1档
+tozalagichlarni to'rtinchi pog'onaga	雨刮调到4档
+rul isitishini ikkinchi pog'onaga	方向盘加热调到2档
+# --- qopqoqlar: bak vs zaryad ---
+yoqilg'i quyish lyukini och	打开油箱盖
+zaryadlash bakini och	打开充电口盖
+zaryadlash teshigini och	打开充电口盖
+yoqilg'i bakini och	打开油箱盖
+zaryadlash qopqog'ini yop	关闭充电口盖
+lyukchani och	打开充电口盖
+# --- gapiruvchi zonasi orqada (DIR=3 chap, 4 o'ng, 5 o'rta) ---
+oynani och	打开后排左车窗	DIR=3
+oynani yop	关闭后排右车窗	DIR=4
+shishani tushir	打开后排右车窗	DIR=4
+oynani och	打开后排车窗	DIR=5
+oynani och	打开副驾车窗	DIR=2
+lampani yoq	打开右后阅读灯	DIR=4
+lampani yoq	打开左后阅读灯	DIR=3
+o'rindiqni isit	打开后排左座椅加热	DIR=3
+massajni yoq	打开后排右座椅按摩	DIR=4
+o'rindiq shamollatishini yoq	打开后排左座椅通风	DIR=3
+orqa o'ng oynani och	打开后排右车窗	DIR=3
+# --- massaj: daraja, rejim, «butun tana» — hamma o'rindiq emas ---
+butun tana massajini yoq	打开主驾座椅按摩
+butun orqa massaji	打开主驾座椅按摩
+butun tana massajini yoq	打开后排右座椅按摩	DIR=4
+massajni to'g'rila	打开主驾座椅按摩
+massajni orqaga yo'naltir	打开主驾座椅按摩
+o'ng o'rindiq massajini yoq	打开副驾座椅按摩
+yelka massajini yoq	打开主驾座椅按摩
+to'lqinli massaj	打开主驾座椅按摩
+massajni ikkinchi pog'onaga	主驾座椅按摩2档
+massajni uchinchi pog'onaga	主驾座椅按摩3档
+massajni birinchi pog'onaga	主驾座椅按摩1档
+massajni maksimumga	主驾座椅按摩3档
+massajni almashtir	换个按摩模式
+boshqa massaj turi	换个按摩模式
+keyingi massaj rejimi	换个按摩模式
+massaj rejimini almashtir	换个按摩模式
+boshqa massaj ko'rinishi	换个按摩模式
+# --- yarim daraja ---
+harorat 22.5	把温度调到22.5度
+harorat 22,5	把温度调到22.5度
+haroratni 22.5 daraja qo'y	把温度调到22.5度
+harorat yigirma ikki yarim	把温度调到22.5度
+haroratni 23 u besh	把温度调到23.5度
+harorat yigirma uch butun besh	把温度调到23.5度
+harorat 22.0	把温度调到22度
+konditsionerni 22.5 ga	把温度调到22.5度
+yarim darajaga issiqroq	温度调高一点
+yarim darajaga sovuqroq	温度调低一点
+yarim daraja issiqroq qil	温度调高一点
+bir yarim darajaga issiqroq	温度调高1.5度
+bir yarim darajaga sovuqroq	温度调低1.5度
+haroratni 22 ga	把温度调到22度
+# --- zonalar: butun so'zlar ---
+o'ng oynani och	打开副驾车窗
+chap oynani och	打开主驾车窗
+ovozni to'g'rila	NULL
+har joyda chiroqni yoq	打开车内所有灯光
+# --- katalog auditi: yangi qurilmalar/rejimlar ---
+vaznsizlik rejimini yoq	打开主驾零重力模式
+o'rindiqni vaznsizlikka yoy	打开主驾零重力模式
+vaznsizlikni o'chir	关闭主驾零重力模式
+yo'lovchiga vaznsizlikni yoq	打开副驾零重力模式
+vaznsizlikni yoq	打开后排右零重力模式	DIR=4
+oldingi tuman chiroqlarini yoq	打开前雾灯
+orqa tuman chiroqlarini o'chir	关闭后雾灯
+shift chirog'ini yoq	打开车顶灯
+shiftdagi chiroqni o'chir	关闭车顶灯
+kutib olish yoritishini yoq	打开迎宾灯效
+kuzatish yoritishini o'chir	关闭欢送灯效
+orqa tozalagichni yoq	打开后雨刮器
+orqa tozalagichni o'chir	关闭后雨刮器
+rul avtomatik isitishini yoq	打开方向盘自动加热
+avtomatik bolalar qulfini yoq	打开自动儿童锁
+to'siq oynani och	打开后隔断玻璃
+to'siq oynani yop	关闭后隔断玻璃
+yukxona oynasini och	打开后备窗	UNSAFE
+yukxona derazasini yop	关闭后备窗	UNSAFE
+avtomatik muzsizlantirishni yoq	打开自动除霜
+konditsioner quritishini yoq	打开自干燥
+qulf ochilganda shamollatishni yoq	打开主动解锁换气
+batareya isitishini yoq	打开电驱堵转加热
+avtomatik resirkulyatsiyani yoq	打开自动内循环
+avtomatik tashqi havo olishni yoq	打开自动外循环
+avtomatik havo aylanishini yoq	打开自动内外循环
+yo'lsizlik yordamini yoq	打开越野辅助
+yo'lsizlik yordamchisini yoq	打开越野辅助
+yo'lsizlik rejimini yoq	切换到越野模式	FIELD_OFF
+tiqilib qoldim chiqishga yordam ber	打开脱困辅助
+loydan chiqishga yordamni yoq	打开脱困辅助
+joyida burilish	打开圆心掉头	UNSAFE
+tankcha burilish	打开圆心掉头	UNSAFE
+kemping rejimi	打开后舱露营
+oldingi salon kempingini yoq	打开前舱露营
+karaoke bilan kemping	打开露营嗨唱模式
+lager qo'riqlashini yoq	打开营地守护
+yulduzlarni ko'rmoqchiman	打开共赏星空
+qirolicha rejimini yoq	打开女王驾到
+romantik kutib olishni yoq	打开浪漫接驾
+osma bilan salomlashni yoq	打开悬架迎宾
+ekranda salomlashni yoq	打开中控屏迎宾
+yordamchi salomlashini yoq	打开精灵迎宾
+bayram salomlashini yoq	打开节日问候
+salomlashni o'chir	关闭日常问候
+xabarnoma ovozini almashtir	换一个提示音
+navigatsiya maslahatlari rejimini almashtir	NULL
+oddiy xarita	NULL
+xaritani oddiyga o'tkaz	NULL
+uchinchisiga qo'ng'iroq qil	打第3个
+ikkinchisini ter	打第2个
+ikkinchi qo'shiqni qo'y	播放第2首
+3-raqamli qo'shiqni qo'y	播放第3首
+# --- katalog auditi: qoplanmagan shoxlar ---
+ijro tezligi bir yarim	1.5倍速播放
+ijro tezligi ikki	2倍速播放
+oddiy ijro tezligi	1倍速播放
+proyeksiya yorqinligini pastroq	HUD亮度调低一点
+proyeksiya burchagini pastroq	HUD角度调低一点
+hud qiyaligini oshir	HUD角度调高一点
+proyeksiyani tushir	HUD高度调低一点
+hudni ko'tar	HUD高度调高一点
+proyeksiya rangini almashtir	切换HUD颜色模式
+hud rejimini almashtir	切换HUD显示模式
+hud sozlamalari	打开抬头显示设置
+proyeksiyani o'chir	关闭抬头显示
+oldingisi	上一个
+avtomobil yo'lisiz	NULL
+dam olish rejimi	打开休息空间
+past tezlikda ovozni yoq	打开低速提示音
+uyg'otish so'zini almashtir	修改唤醒词
+registratorni to'xtat	停止录像
+bo'ldi	停止播报
+bolalar rejimini yoq	打开儿童模式
+radioni 101 chastotasiga sozla	收音机调到101兆赫	FIELD_OFF
+uyg'otishsiz rejimni yoq	打开免唤醒
+hammasini yop	一键全关
+360 kamerani o'chir	关闭360
+yukxona tomini och	打开上尾门	UNSAFE
+yukxona pastki bortini yop	关闭下尾门	UNSAFE
+kapotni yop	关闭前备箱	UNSAFE
+avariyani o'chir	关闭双闪
+navigatsiya maslahatlarini o'chir	NULL
+navigatsiya maslahatlarini yoq	NULL
+navigatsiya qisqa	NULL
+navigatsiya batafsil	NULL
+navigatsiyani pastroq	导航音量调小一点
+havo tebranishini yoq	打开扫风
+havo tebranishini o'chir	关闭扫风
+havo tebranishining boshqa rejimi	换个扫风模式
+radioni o'chir	暂停
+rul isitishini o'chir	关闭方向盘加热
+rul isitishini kuchliroq	方向盘加热调高一点
+rulni pastroq	方向盘调低一点
+rulni og'irroq qil	转向调到运动模式
+harorat sinxronlashni o'chir	关闭温度同步
+shamolni o'chir	关闭空调风量
+ventilyatorni yoq	打开空调风量
+shamolni minimumga	风量调到最小
+tozalagichlarni o'chir	关闭雨刮	FIELD_OFF
+tozalagichlarni sekinroq	雨刮慢一点
+tozalagichlar servis rejimi	打开雨刮维修模式	FIELD_OFF
+aromatizatorni o'chir	关闭香氛
+yana 10 daqiqa uxlayman	再睡10分钟
+soat 7 da uyg'ot	睡到7点叫我
+xaritani 3d ga	NULL
+fleshkadan musiqani yoq	切换到USB音乐
+zaryadni saqlash rejimi	切换到保电模式
+manba onlayn musiqa	切换到在线音乐
+gibrid rejimni yoq	切换到混动模式
+elektr rejimni yoq	切换到纯电模式
+standart haydash rejimi	切换到标准模式	FIELD_OFF
+xarita shimol yuqorida	NULL
+xarita yo'nalish bo'yicha	NULL
+ekranni vertikal	切换到竖屏
+ovoz sifatini oshir	切换到高音质
+kamera ko'rinishini almashtir	切换摄像头视角
+uchinchisini o'chir	删除第3个
+parkovka marshrutini o'chir	删除记忆泊车路线	UNSAFE
+yo'lovchi ekranini pastroq	副驾屏幕角度调低一点
+pardoz rejimi	打开化妆空间
+kasalxonani top	NULL
+supermarketni top	NULL
+mehmonxonani top	NULL
+dorixona qayerda	NULL
+moykani top	NULL
+qo'ng'iroqni bekor qil	取消拨打
+ergashishni bekor qil	取消跟车	UNSAFE
+orqani ko'rish yordamchisini yoq	打开后方视野辅助
+ko'zguni pastga	后视镜向下调一点
+ko'zguni o'ngga	后视镜向右调一点
+ko'zguni chapga	后视镜向左调一点
+ko'zgular avtomatik yig'ilishini yoq	打开后视镜自动折叠
+striming ko'zguni yoq	打开流媒体后视镜
+ko'zgular sozlamalari	打开后视镜设置
+o'ngga o't	向右变道	UNSAFE
+lyukni yarim och	天窗开一半
+shriftni maydaroq	字体调小一点
+uydagi pardalarni och	打开家里的窗帘
+uydagi quritgichni yoq	打开家里的除湿机
+uydagi konditsionerni 24 ga	家里空调调到24度
+rozetkani yoq	打开对外放电
+navigatsiya kartochkasini yoq	NULL
+ekran yorqinligini minimumga	屏幕亮度调到最小
+ekran tozalash rejimi	打开屏幕清洁模式
+ekran rang haroratini sovuqroq	屏幕色温调冷一点
+ekranni yoq	打开屏幕
+ilovalar do'konini och	打开应用商店
+brauzerni och	打开浏览器
+kalendarni och	打开日历
+o'rindiq isitishini kuchsizroq	主驾座椅加热调低一点
+o'rindiq yostig'ini pastroq	主驾座椅坐垫调低一点
+o'rindiq shamollatishini kuchliroq	主驾座椅通风调高一点
+o'rindiq shamollatishini kuchsizroq	主驾座椅通风调低一点
+o'rindiq suyanchig'ini to'g'riroq	主驾座椅靠背角度调小一点
+o'rindiq suyanchig'ini ko'tar	竖起主驾座椅靠背
+belni kuchsizroq	腰部支撑调低一点
+oyoq tagligini qisqaroq	腿托调短一点
+oyoq tagligini uzunroq	腿托调长一点
+oyoq tayanchini pastroq	腿部支撑调低一点
+oyoq tayanchini balandroq	腿部支撑调高一点
+oyoq tagligini yig'	收起主驾脚托
+oyoq tagligini chiqar	打开主驾脚托
+qulay o'tirish	打开舒适进出
+massajni kuchsizroq	按摩强度调小一点
+parkovkani eslab qol	开始记忆泊车	UNSAFE
+parkovka pauza	暂停泊车	UNSAFE
+parkovkani davom ettir	继续泊车	UNSAFE
+parkovkaga kir	泊入车位	UNSAFE
+ikkinchi yo'lakda yur	走第2车道	UNSAFE
+quvib o't	超过前车	UNSAFE
+masofa 2	跟车距离调到2档	UNSAFE
+navigatsiya pilotini yoq	打开领航辅助	UNSAFE
+tezlik chegarasi eslatmasi	打开限速提醒	UNSAFE
+oldinga o'tkaz	快进15秒
+5 daqiqaga o'tkaz	跳到第5分钟
+shikoyat qilmoqchiman	我要反馈问题
+telefon eslatmasi	打开手机遗忘提醒
+eslatmalarni yoq	打开日程提醒
+ssenariylarni och	打开场景模式页面
+tinglash tarixi	打开播放历史
+sevimlilarni och	打开收藏夹
+podsvetka musiqa ritmida	打开氛围灯律动模式
+podsvetka gradient bilan	打开氛围灯渐变效果
+podsvetka mavzusini almashtir	氛围灯换个主题
+podsvetka to'q sariq	氛围灯调成橙色
+podsvetka oq	氛围灯调成白色
+podsvetka qizil	氛围灯调成红色
+podsvetka yashil	氛围灯调成绿色
+podsvetka sariq	氛围灯调成黄色
+podsvetka pushti	氛围灯调成粉色
+registrator albomi	打开行车记录仪相册
+konditsioner namlikni kamaytirish	打开除湿模式
+kengaytirish rejimi	打开拓展模式
+personajni almashtir	换个精灵形象
+erkak ovozi	换成男声
+kutib olish rejimi	打开接驾模式
+tetiklik rejimi	打开提神模式
+o'tkazib yuborilgan qo'ng'iroqlar	播放未接来电
+kontaktlardan ivanni top	查找联系人ivan
+yuvish rejimi	打开洗车模式
+haroratni minimumga	温度调到最低
+biz qayerga ketyapmiz	NULL
+ketganda yop	打开离车自动闭锁
+ishni eslab qol	NULL
+uyni eslab qol	NULL
+ovozni minimumga	音量调到最小
+vidjetlarni och	打开负一屏
+salondagi havo qanday	车内空气质量怎么样
+tashqi ovozni yoq	打开车外语音
+faralarni pastroq	近光灯高度调低一点
+faralarni balandroq	近光灯高度调高一点
+yordamchidan chiq	退出语音
+ovoz maydoni butun salonga	音场切换到全车
+ovozni yaxshilashni yoq	打开音质增强
+qo'shiqlar tartib bilan	顺序播放
+ukachka rejimi	打开晕车缓解
+pari rejimini yoq	打开仙女副驾
+yukxona tomini yop	关闭上尾门	UNSAFE
+yukxona pastki bortini och	打开下尾门	UNSAFE
+avtomatik havo tozalashni yoq	打开自动空气净化器
+# --- COMMANDS.md: ommaviy ro'yxatning har bir iborasi ---
+haroratni 22 qil	把温度调到22度
+orqa o'ng o'rindiqni isit	打开后排右座椅加热
+o'rindiq shamollatishini o'chir	关闭主驾座椅通风
+massajni o'chir	关闭主驾座椅按摩
+yo'lovchiga massaj	打开副驾座椅按摩
+massaj rejimini almashtir	换个按摩模式
+o'rindiqni oldinga	主驾座椅往前调一点
+haydovchi oynasini och	打开主驾车窗
+hamma oynalarni yop	关闭所有车窗
+orqadagi oynalarni yop	关闭后排车窗
+pardani och	打开遮阳帘
+orqadagi pardani tushir	关闭车窗遮阳帘
+oyna ko'targichlarni blokla	打开车窗锁
+oyna ko'targichlarni blokdan chiqar	关闭车窗锁
+hammasini och	一键全开
+hammasini yop	一键全关
+zaryadlash qopqog'ini yop	关闭充电口盖
+muzlatgichni o'chir	关闭车载冰箱
+faralarni o'chir	关闭近光灯
+orqa chapda chiroqni yoq	打开左后阅读灯
+yordamchi ovozini pastroq	语音音量调小一点
+telefon ovozini balandroq	通话音量调大一点
+masofani kattaroq	跟车距离调大一点	UNSAFE
+oynalardagi pardalarni yop	关闭车窗遮阳帘
+# --- lyuk/panorama foizlar bilan ---
+lyukni 30 foizga och	天窗开到百分之30
+panoramani 20 foizga och	天窗开到百分之20
+panoramali lyukni 70 foizga och	天窗开到百分之70
+lyukni uchdan birga och	天窗开到百分之33
+panoramani yarim och	天窗开一半
+tomni 40 foizga och	天窗开到百分之40
+# --- muvaffaqiyatsizliklar jurnali: mapper yolg'on ishlashlari ---
+rekuperatsiyani o'n foizga yoq	NULL
+zaryadlashni ertalab beshdan oltigacha yoq	NULL
+oktyabr to'qson to'qqizni yoq	NULL
+uch yuz oltmish ko'rinishni yoq	打开360全景影像
+uchinchisini yoq	播放第3首
+uchinchi qo'shiqni yoq	播放第3首
+snoop dogg qo'shig'ini yoq	NULL
+lobodani qo'y	NULL
+pushkin yangi darvoza o'n birga qo'ng'iroq qil	NULL
+onamga qo'ng'iroq qil	给onam打电话
+oq vino uchun mos muzlatgich harorati	NULL
+lekin rangi bo'yicha yaxshi mos keladi	NULL
+kunduzgi yurish chiroqlarini yoq	打开位置灯	FIELD_OFF
+kunduzgi chiroqlarni yoq	打开位置灯	FIELD_OFF
+orqa o'rindiqni standart rejimga qo'y	NULL
+hamma anya navigatorni och	NULL
+hammasini och	一键全开
+hammasini yop	一键全关
+qo'shiqni yoq	播放
+# --- E07 ajratilgan beshinchi eshik ---
+yukxona tomini och	打开上尾门	UNSAFE
+yukxona yuqori qismini yop	关闭上尾门	UNSAFE
+yukxona yuqori qismini och	打开上尾门	UNSAFE
+bortni tushir	打开下尾门	UNSAFE
+yukxona bortini yotqiz	打开下尾门	UNSAFE
+bortni ko'tar	关闭下尾门	UNSAFE
+pastki bortni yop	关闭下尾门	UNSAFE
+kuzov pastki bortini tushir	打开下尾门	UNSAFE
+yukxona qopqog'ini och	打开后备箱	UNSAFE
+kuzovni och	打开后备箱	UNSAFE
+yukxona chirog'ini yoq	打开后备箱灯
+
+# --- dala ma'lumotlari 14–17.09.2026: tests.tsv dagi yangi bo'limning o'zbekcha ko'zgusi ---
+yandeks radioni yoq	NULL
+yandeks musiqani och	NULL
+musiqani yoq	播放
+musiqani qo'y	播放
+tozalagichlarni ko'tar	打开雨刮维修模式	FIELD_OFF
+sport rejimini yoq	切换到运动模式	FIELD_OFF
+gabarit chiroqlarini yoq	打开示廓灯	FIELD_OFF
+oynani to'qson foizga yop	主驾车窗开到百分之10
+oynani yarim yop	主驾车窗开一半
+tashqi havoni yoq	打开外循环
+pardani yarim och	遮阳帘开一半
+panorama pardasini yarim och	遮阳帘开一半
+pardani o'ttiz foizga och	遮阳帘开到百分之30
+pardani o'ttiz foizga yop	遮阳帘开到百分之70

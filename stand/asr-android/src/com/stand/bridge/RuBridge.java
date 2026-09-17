@@ -201,6 +201,9 @@ public final class RuBridge {
     private static final String ACTION = "com.stand.NLU";
     private static Context appCtx;
     private static volatile String lastText = "";   // latest ASR hypothesis for current utterance
+    /** Language of the current utterance ("ru" | "kk" | "ky" | "uz" | "en"), sent to the backend as
+     *  `lang`. Only the multilingual build (GigaAM-Multilingual, GIGAAM_ML=1) ever sets it to non-"ru". */
+    static volatile String curLang = "ru";
     private static volatile int wakeZone = 1;        // detected speaking zone (SrBaseSession.getCurrentDirect: 1=driver,2=passenger,3/4=rear,5=rear-mid)
     // Force offline: online chat backend isn't ready, so unrecognized phrases give a local RU reply
     // instead of hitting the cloud. Flip to false once the LLM backend is live.
@@ -431,9 +434,9 @@ public final class RuBridge {
         // SAFETY: negation/question («не закрывай окно», «как работает…») -> whole phrase to chat,
         // don't let fuzzyFix strip the «не» and turn it into a command.
         if (isGuarded(text.toLowerCase().replace('ё', 'е'))) return text;
-        if (ru2zh(text, wakeZone) != null) return text;                          // understood as-is
+        if (ru2zhAll(text, wakeZone) != null) return text;                       // understood as-is (simple or compound)
         String fx = fuzzyFix(text);
-        if (!fx.equals(text) && ru2zh(fx, wakeZone) != null) return fx;          // fuzzy rescue
+        if (!fx.equals(text) && ru2zhAll(fx, wakeZone) != null) return fx;       // fuzzy rescue
         return fuzzyFix(text);
     }
 
@@ -482,6 +485,29 @@ public final class RuBridge {
                 wakeZone = currentDirect(session, wakeZone); // which seat spoke
                 String text = com.stand.asr.GigaAsr.finish();
                 if (text != null && !text.isEmpty()) Log.i(TAG, "RU ASR (GigaAM): " + text);
+                // Multilingual build: a non-Russian phrase (kk/ky/uz/en) has no ru2zh mapping and MUST
+                // NOT pass through fuzzyFix (a Kazakh word one edit away from a Russian command word would
+                // be "corrected" into an actuation). It goes straight to the backend, tagged with its
+                // language; the backend answers in that language and may still return car commands.
+                String lang = com.stand.asr.GigaAsr.multilingual() ? com.stand.asr.GigaAsr.detectLang(text) : "ru";
+                curLang = lang;
+                if (!"ru".equals(lang)) {
+                    String t = text == null ? "" : text.trim();
+                    int letters = 0;
+                    for (int i = 0; i < t.length(); i++) if (Character.isLetter(t.charAt(i))) letters++;
+                    if (letters <= 1) return;   // ASR tail noise, same rule as handlePhraseZh
+                    lastText = t;
+                    Log.i(TAG, "ASR final (" + lang + ", zone " + wakeZone + "): " + t);
+                    // Uzbek has an OFFLINE command mapper (Uz2Ru → ru2zh, unit-tested against the whole
+                    // Russian suite): a known car command actuates without the backend, like Russian.
+                    if ("uz".equals(lang)) {
+                        String zh = Uz2Ru.uz2zh(t, wakeZone);
+                        if (zh != null) { noteInjected(t, zh, 1); Log.i(TAG, "uz2zh: [" + t + "] -> " + zh); injectZh(zh); return; }
+                    }
+                    if (OFFLINE_ONLY) showOnScreen("Не поняла команду", TYPE_FEEDBACK);
+                    else sendToCloud(t);
+                    return;
+                }
                 String query = chooseQuery(text == null ? "" : text); // raw, then fuzzyFix
                 if (query != null && !query.isEmpty()) {
                     lastText = query;   // so swap()/CloudNlu surface our RU text, never the native Chinese
@@ -977,7 +1003,7 @@ public final class RuBridge {
                 final String rid = "standask-" + System.currentTimeMillis();
                 // Attach live car status so our LLM has context the stock cloud never gets.
                 JSONObject bodyObj = new JSONObject()
-                        .put("requestId", rid).put("query", text).put("lang", "ru")
+                        .put("requestId", rid).put("query", text).put("lang", curLang)
                         .put("carStatus", collectStatus())
                         .put("installedApps", collectApps())   // user-installed pkgs -> backend app-action registry
                         .put("history", historyArr())          // last ~3 exchanges (role+text) for multi-turn context
@@ -1175,6 +1201,15 @@ public final class RuBridge {
             String tuid = comVar("sTuid");           if (!tuid.isEmpty()) s.put("tuid", tuid);
             String cm   = comVar("sCarModelItems");  if (!cm.isEmpty())   s.put("carModel", cm);
             s.put("ts", System.currentTimeMillis());
+            // Local clock for the backend: it answers "what time is it" / date questions from carStatus.timezone
+            // or carStatus.now and falls back to Europe/Moscow — wrong for a car in Kazakhstan/Uzbekistan.
+            try {
+                java.util.TimeZone tz = java.util.TimeZone.getDefault();
+                s.put("timezone", tz.getID());
+                java.text.SimpleDateFormat iso = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", java.util.Locale.US);
+                iso.setTimeZone(tz);
+                s.put("now", iso.format(new java.util.Date()));
+            } catch (Throwable ignored) {}
             Object m = caCarMgr();
             // Confirmed-readable in stock CaCarManager (gear / door locks / seat degrees):
             putInt(s, "gear",         carInt(m, 1082131456, 0));  // 1=P 2=R 3=N (>=4 D)
@@ -1738,12 +1773,26 @@ public final class RuBridge {
             speak("Русская озвучка включена. Перезапустите ассистента.");
             showOnScreen("Русская озвучка (перезапустите ассистента)", TYPE_FEEDBACK); return;
         }
-        String zh = ru2zh(ru, wakeZone);
-        if (zh != null) {
+        // ru2zhAll: one command for a simple phrase, one per clause for a compound («закрой все окна и
+        // выключи климат»); null if any clause is unknown → the whole phrase goes to the backend.
+        final String[] zhs = ru2zhAll(ru, wakeZone);
+        if (zhs != null && zhs.length == 1) {
             // Remember it (try #1) in case the native NLU can't handle the injected command: we then
             // re-send the RU to the LLM for one corrected try. See onLocalCommandFailed.
-            noteInjected(ru, zh, 1);
-            Log.i(TAG, "ru2zh: [" + ru + "] -> " + zh); injectZh(zh); return;
+            noteInjected(ru, zhs[0], 1);
+            Log.i(TAG, "ru2zh: [" + ru + "] -> " + zhs[0]); injectZh(zhs[0]); return;
+        }
+        if (zhs != null) {
+            // Compound: inject clause by clause, serialized like the backend's multi-intent path. Not noted
+            // for the failure retry — a retry would re-run the clauses that already worked.
+            Log.i(TAG, "ru2zh compound: [" + ru + "] -> " + java.util.Arrays.toString(zhs));
+            new Thread(new Runnable() { public void run() {
+                for (int i = 0; i < zhs.length; i++) {
+                    if (i > 0) { try { Thread.sleep(900); } catch (InterruptedException ignored) {} }
+                    injectZh(zhs[i]);
+                }
+            }}).start();
+            return;
         }
         // Free-form (weather / knowledge / chat): the command map missed → send RAW Russian to our
         // backend. It answers in Russian and may return car commands (executed inside sendToCloud).

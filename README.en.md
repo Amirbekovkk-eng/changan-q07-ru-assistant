@@ -53,30 +53,45 @@ patched app installs as a normal system‑app update **without root**.
    adb -s "$SER" pull "$P" ./SpeechAssistant.orig.apk
    ```
 
-   > Two model files (>100 MB) are not tracked by git — see [MODELS.md](MODELS.md) and place them at the
+   > The model files (>100 MB) are not tracked by git — see [MODELS.md](MODELS.md) and place them at the
    > listed paths before building.
 
 2. Build (auto‑detects `JAVA_HOME` / `ANDROID_HOME`; export them if needed):
 
    ```sh
-   ./build.sh ./SpeechAssistant.orig.apk out/speechassistant-ru2zh.apk
+   ./build.sh ./SpeechAssistant.orig.apk out/speechassistant-ru.apk
+   VARIANT=multi ./build.sh ./SpeechAssistant.orig.apk out/speechassistant-multi.apk
    ```
+
+   Two APK variants: `ru` — Russian-only speech recognition (GigaAM‑v3); `multi` — multilingual
+   recognition (GigaAM‑Multilingual): Russian, Kazakh, Kyrgyz, Uzbek, English. In `multi`, Russian
+   phrases take the usual path (offline commands via ru2zh); a phrase in another language is detected
+   by its letters and sent to the backend with a `lang` field — the backend answers and confirms
+   commands in that same language. The voice stays the Russian TeraTTS one (Kazakh/Kyrgyz letters are
+   folded to the nearest Russian ones, Latin is read as is).
+
+   Uzbek additionally has an OFFLINE command mapper: `Uz2Ru` rewrites the Uzbek phrase into Russian
+   keywords (stems, numerals, negation, question words) and hands it to the same `ru2zh`, so
+   "oynani och", "haroratni 22 ga qo'y", "musiqani balandroq qil" actuate without the network, like
+   Russian. Verified by the same suite: `tests_uz.tsv` — 1010 Uzbek phrases with the same expected
+   Chinese commands as `tests.tsv`, plus `chatter_uz.txt` (small talk must never become a command).
 
 ## Prebuilt APK
 
 The built APK is not kept in git (~930 MB, contains the patched stock app); it is published under
 [Releases](https://github.com/voronoff2803/changan-a06-ru-assistant/releases): download
-`speechassistant-ru-vX.Y.Z.apk`, check the `.sha256`, install as below.
+`speechassistant-ru-vX.Y.Z.apk` (Russian only) or `speechassistant-multi-vX.Y.Z.apk` (Russian + Kazakh +
+Kyrgyz + Uzbek + English), check the `.sha256`, install as below.
 
 Maintainer: `./release.sh 1.0.5 ./SpeechAssistant.orig.apk` builds, runs the tests, tags `v1.0.5` and
 uploads the APK with `gh`. Or push a `v*` tag and let `.github/workflows/release.yml` build and attach
 the APK (needs the secrets `STOCK_APK_URL`, `GIGAAM_MODEL_URL`, `TERA_SAMPLER_URL` — private URLs of
-the stock APK and the two large models). The mapper tests run on every push (`ci.yml`).
+the stock APK and the large models; `multi` also needs `GIGAAM_ML_MODEL_URL`). The mapper tests run on every push (`ci.yml`).
 
 ## Install
 
 ```sh
-adb push out/speechassistant-ru2zh.apk /data/local/tmp/sa.apk
+adb push out/speechassistant-ru.apk /data/local/tmp/sa.apk
 adb shell pm install -r -d -g -t /data/local/tmp/sa.apk
 adb shell am force-stop com.incall.apps.speechassistant
 ```

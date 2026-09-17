@@ -323,12 +323,21 @@ if [ "${TERA:-0}" = "1" ]; then
   ( cd "$wd" && zip -q -0 -r _p.apk assets/tera )
 fi
 
-# --- GIGAAM: GigaAM-v3 CTC offline ASR (sherpa-onnx) -> assets/gigaam (~224MB int8, stored).
+# --- GIGAAM: GigaAM CTC offline ASR (sherpa-onnx) -> assets/gigaam (~224MB int8, stored).
 #     The recognizer (RuBridge.ENGINE_GIGAAM=true). Needs BRIDGE=1 (classes7 has
-#     GigaAsr + the smali feed tap) and PIPER=1 (bundles libsherpa-onnx-jni.so from piper/jni). ---
+#     GigaAsr + the smali feed tap) and PIPER=1 (bundles libsherpa-onnx-jni.so from piper/jni).
+#     GIGAAM_ML=1 ships GigaAM-Multilingual (ru/kk/ky/uz/en, asr-android/gigaam-ml/) instead of the
+#     Russian-only v3 (asr-android/gigaam/). Same runtime, same asset path; GigaAsr tells them apart
+#     by the vocabulary in tokens.txt and routes non-Russian phrases to the backend. ---
 if [ "${GIGAAM:-0}" = "1" ]; then
-  GDIR="$STAND_DIR/asr-android/gigaam"
-  echo "[build_sa] +GIGAAM: GigaAM-v3 CTC model (~224MB, stored)"
+  if [ "${GIGAAM_ML:-0}" = "1" ]; then
+    GDIR="$STAND_DIR/asr-android/gigaam-ml"
+    echo "[build_sa] +GIGAAM: GigaAM-Multilingual CTC model ru/kk/ky/uz/en (~225MB, stored)"
+  else
+    GDIR="$STAND_DIR/asr-android/gigaam"
+    echo "[build_sa] +GIGAAM: GigaAM-v3 CTC model, Russian (~224MB, stored)"
+  fi
+  [ -f "$GDIR/model.int8.onnx" ] || { echo "[build_sa] missing $GDIR/model.int8.onnx (see MODELS.md)"; exit 1; }
   rm -rf "$wd/assets/gigaam"; mkdir -p "$wd/assets/gigaam"
   cp "$GDIR/model.int8.onnx" "$GDIR/tokens.txt" "$wd/assets/gigaam/"
   ( cd "$wd" && zip -q -0 -r _p.apk assets/gigaam )

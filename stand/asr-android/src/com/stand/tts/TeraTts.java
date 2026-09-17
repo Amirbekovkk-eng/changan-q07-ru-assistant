@@ -279,10 +279,30 @@ public final class TeraTts {
     static String ttsNormalize(String t) {
         if (t == null) return "";
         String s = t.replaceAll("[°℃]\\s?[CcСс]?", "");          // degree unit
+        s = foldKkKy(s);
         s = expandUnit(s, "%",  "процент", "процента", "процентов");
         s = expandUnit(s, "км", "километр", "километра", "километров");
         s = femPresent(s);
         return s.replaceAll("\\s{2,}", " ").trim();
+    }
+
+    // Kazakh / Kyrgyz letters are not in the ru_f2 character table (unicode_indexer -> -1) and the
+    // engine silently DROPS them, mangling every word ("қой" -> "ой"). The multilingual build answers
+    // in those languages, so fold each one to the nearest Russian letter: the voice stays Russian-
+    // accented but the words remain recognizable. No-op for Russian text.
+    private static final String KK_KY_FROM = "әғқңөұүһіӘҒҚҢӨҰҮҺІ";
+    private static final String KK_KY_TO   = "агкноууxиАГКНОУУХИ";
+    static String foldKkKy(String s) {
+        if (s == null || s.isEmpty()) return s;
+        StringBuilder sb = null;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            int k = KK_KY_FROM.indexOf(c);
+            if (k < 0) { if (sb != null) sb.append(c); continue; }
+            if (sb == null) { sb = new StringBuilder(s.length()); sb.append(s, 0, i); }
+            sb.append(KK_KY_TO.charAt(k));
+        }
+        return sb == null ? s : sb.toString();
     }
 
     /** Replace "<number><unit>" with the number + the RU-agreeing word (1 процент / 2 процента / 5 процентов). */

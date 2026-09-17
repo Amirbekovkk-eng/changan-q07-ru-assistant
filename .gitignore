@@ -13,6 +13,12 @@ SpeechAssistant*.apk
 # large model weights (> GitHub's 100 MB/file limit) — see MODELS.md.
 # They stay on disk so the local build works; they are just not tracked by git.
 stand/asr-android/gigaam/model.int8.onnx
+stand/asr-android/gigaam-ml/model.int8.onnx
+# multilingual export scratch (checkpoint, fp32 onnx, venvs) — see stand/asr-android/gigaam-ml/export_ml.py
+stand/asr-android/gigaam-ml/ckpt/
+stand/asr-android/gigaam-ml/*.onnx
+stand/asr-android/gigaam-ml/.venv*/
+stand/asr-android/gigaam-ml/*.log
 tools/tera-tts-java/assets/models/sampler_distilled_cfg3_4step.onnx
 
 # compiled by the ru2zh unit tests (run_tests.sh)

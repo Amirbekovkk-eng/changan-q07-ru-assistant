@@ -112,7 +112,21 @@
 
    ```sh
    ./build.sh ./SpeechAssistant.orig.apk out/speechassistant-ru.apk
+   VARIANT=multi ./build.sh ./SpeechAssistant.orig.apk out/speechassistant-multi.apk
    ```
+
+   Два варианта APK: `ru` — распознавание только русского (GigaAM‑v3); `multi` — мультиязычное
+   распознавание (GigaAM‑Multilingual): русский, казахский, кыргызский, узбекский, английский.
+   В `multi` русские фразы идут по обычному пути (команды офлайн через ru2zh), а фраза на другом
+   языке определяется по буквам и уходит на бэкенд с полем `lang` — тот отвечает и подтверждает
+   команды на том же языке. Озвучка остаётся русским голосом TeraTTS (казахские/кыргызские буквы
+   сводятся к ближайшим русским, латиница читается как есть).
+
+   Узбекский вдобавок имеет ОФЛАЙН‑маппер команд: `Uz2Ru` переписывает узбекскую фразу в русские
+   ключевые слова (стемы, числительные, отрицания, вопросы) и отдаёт её тому же `ru2zh`, так что
+   «oynani och», «haroratni 22 ga qo'y», «musiqani balandroq qil» исполняются без сети, как русские.
+   Проверяется тем же набором тестов: `tests_uz.tsv` — 1010 узбекских фраз с теми же ожидаемыми
+   китайскими командами, что и `tests.tsv`, плюс `chatter_uz.txt` (болтовня не должна стать командой).
 
    `build.sh` делает два шага: `stand/asr-android/build_dex.sh` (javac + d8 → `classes7.dex`) и
    `stand/build_sa.sh` (baksmali → патчи → упаковка dex/ассетов/библиотек → zipalign → подпись).
@@ -124,6 +138,7 @@
 | `PROFILE=car HOST=…` | профиль машины; `HOST` — куда перенаправить эндпоинты Changan (по умолчанию тупик) |
 | `BRIDGE=1` | добавить `classes7.dex` и все хуки RuBridge |
 | `GIGAAM=1` | модель GigaAM в `assets/gigaam` |
+| `GIGAAM_ML=1` | вместо GigaAM‑v3 положить GigaAM‑Multilingual (`stand/asr-android/gigaam-ml/`) — вариант `multi` |
 | `TERA=1` | ассеты TeraTTS в `assets/tera` |
 | `PIPER=1` | JNI‑библиотеки sherpa‑onnx и onnxruntime (историческое имя флага) |
 | `NO_CN_SR=1` | отключить китайское распознавание, оставить wake‑word |
@@ -138,13 +153,14 @@
 
 Собранный APK не хранится в git (он ~930 МБ и содержит патченное штатное приложение), а
 публикуется в [Releases](https://github.com/voronoff2803/changan-a06-ru-assistant/releases):
-скачайте `speechassistant-ru-vX.Y.Z.apk`, сверьте `.sha256` и ставьте по инструкции ниже.
+скачайте `speechassistant-ru-vX.Y.Z.apk` (только русский) или `speechassistant-multi-vX.Y.Z.apk`
+(русский + казахский + кыргызский + узбекский + английский), сверьте `.sha256` и ставьте по инструкции ниже.
 
 Публикация релиза (для мейнтейнера): `./release.sh 1.0.5 ./SpeechAssistant.orig.apk` — собирает,
 гоняет тесты, ставит тег `v1.0.5` и загружает APK в релиз через `gh`. Альтернатива —
 workflow `.github/workflows/release.yml`: по тегу `v*` GitHub Actions сам собирает и прикладывает
 APK к релизу; ему нужны секреты `STOCK_APK_URL`, `GIGAAM_MODEL_URL`, `TERA_SAMPLER_URL`
-(приватные ссылки на штатный APK и две большие модели). Тесты маппера гоняются на каждый push
+(приватные ссылки на штатный APK и большие модели, для `multi` ещё `GIGAAM_ML_MODEL_URL`). Тесты маппера гоняются на каждый push
 (`.github/workflows/ci.yml`).
 
 ## Установка

@@ -41,6 +41,9 @@ public final class GigaAsr {
     private static final int THREADS = 3;               // big cluster on MT6897 (like TeraTTS)
 
     private static volatile OfflineRecognizer rec;
+    /** true when the bundled tokens.txt is the GigaAM-Multilingual vocabulary (Latin + Cyrillic +
+     *  Kazakh/Kyrgyz letters) — the "multi" build (build_sa GIGAAM_ML=1). false = v3 Russian-only. */
+    private static volatile boolean multilingual;
     private static Context appCtx;
     private static final ByteArrayOutputStream buf = new ByteArrayOutputStream(1 << 20);
 
@@ -60,6 +63,8 @@ public final class GigaAsr {
                 Log.i(TAG, "unpacking GigaAM assets to " + dir + " (~224 MB, one-time)");
                 unpackAssets(ASSET_DIR, dir);
             }
+            multilingual = vocabHasLatin(toks);
+            Log.i(TAG, "vocabulary: " + (multilingual ? "multilingual (ru/kk/ky/uz/en)" : "russian (v3)"));
             OfflineNemoEncDecCtcModelConfig nemo =
                     OfflineNemoEncDecCtcModelConfig.builder().setModel(onnx.getAbsolutePath()).build();
             OfflineModelConfig model = OfflineModelConfig.builder()
@@ -84,6 +89,26 @@ public final class GigaAsr {
 
     public static boolean ready() { return rec != null; }
 
+    /** Multilingual build (GigaAM-Multilingual CTC)? Only meaningful once the recognizer is ready. */
+    public static boolean multilingual() { return multilingual; }
+
+    /** tokens.txt lines are "<char> <id>"; the multilingual vocabulary has a-z, the v3 one doesn't. */
+    private static boolean vocabHasLatin(File tokens) {
+        try {
+            java.io.BufferedReader r = new java.io.BufferedReader(
+                    new java.io.InputStreamReader(new java.io.FileInputStream(tokens), "UTF-8"));
+            String line; boolean latin = false;
+            while ((line = r.readLine()) != null) {
+                if (line.length() >= 3 && line.charAt(1) == ' ' && line.charAt(0) >= 'a' && line.charAt(0) <= 'z') { latin = true; break; }
+            }
+            r.close();
+            return latin;
+        } catch (Throwable t) { Log.e(TAG, "vocabHasLatin", t); return false; }
+    }
+
+    /** Language of a transcript ("ru" | "kk" | "ky" | "uz" | "en") — see {@link LangDetect}. */
+    public static String detectLang(String text) { return LangDetect.detect(text); }
+
     /** Start of a new utterance (wp==1): drop any leftover audio. */
     public static void reset() { synchronized (buf) { buf.reset(); } }
 
@@ -93,7 +118,7 @@ public final class GigaAsr {
         synchronized (buf) { buf.write(pcm, 0, Math.min(len, pcm.length)); }
     }
 
-    /** End of utterance (wp==3): decode accumulated PCM to Russian text (lowercase, no punctuation). */
+    /** End of utterance (wp==3): decode accumulated PCM to text (lowercase, no punctuation). */
     public static String finish() {
         if (!ensure()) { Log.e(TAG, "finish: recognizer not ready"); return ""; }
         byte[] b;
