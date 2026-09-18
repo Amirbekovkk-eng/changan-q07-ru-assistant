@@ -51,7 +51,7 @@ final class Ru2Zh {
     /** Clauses of a compound command («закрой все окна и выключи климат»), or null if the phrase is simple. */
     static String[] clausesOf(String s) {
         String[] parts = s.trim().split(CONJ);
-        if (parts.length < 2 || parts.length > 3) return null;
+        if (parts.length < 2) return null;
         for (String p : parts) if (!CMD_VERB.matcher(p).find()) return null;   // «дуй в лицо и в ноги» stays simple
         return parts;
     }
@@ -62,6 +62,9 @@ final class Ru2Zh {
         String s = t.toLowerCase().replace('ё', 'е');
         String[] parts = clausesOf(s);
         if (parts == null) { String one = ru2zh(t, speakerDir); return one == null ? null : new String[]{one}; }
+        // More than three clauses is the backend's job. It must NOT fall back to the single mapper: that one
+        // mixes the clauses' slots («открой окно и … и выключи свет» came out as «close the window»).
+        if (parts.length > 3) return null;
         String[] out = new String[parts.length];
         for (int i = 0; i < parts.length; i++) { out[i] = ru2zh(parts[i], speakerDir); if (out[i] == null) return null; }
         return out;
