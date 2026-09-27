@@ -95,8 +95,9 @@ s=s[:m.end()] + inj + s[m.end():]
 with open(va,"w",encoding="utf-8") as f: f.write(s)
 
 # Stage 1 deliberately leaves stock NLU arbitration untouched.
-# The trigger calls RuBridge.handlePhrase(), which calls NluManager.onFinalAsrResult()
-# with the Q07-compatible signature already used by the project:
+# The trigger calls RuBridge.handlePhraseZh(), which maps Russian text through the
+# scenario engine and then calls NluManager.onFinalAsrResult() with the Q07-compatible
+# signature confirmed from stock classes5.dex:
 # (String requestId, int direction, String asrText, boolean confident).
 
 if TTS_HOOK:
