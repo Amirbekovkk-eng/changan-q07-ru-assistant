@@ -44,9 +44,7 @@ bash "$HERE/asr-android/build_dex.sh"
 WD="$HERE/work/q07_build"
 rm -rf "$WD"
 mkdir -p "$WD"
-unzip -o -j "$SRC" classes5.dex >/dev/null
-
-cp "$PWD/classes5.dex" "$WD/classes5.dex"
+unzip -o -j "$SRC" classes5.dex -d "$WD" >/dev/null
 java -jar "$ROOT/tools/baksmali.jar" d --api 34 "$WD/classes5.dex" -o "$WD/smali5"
 
 SM="$WD/smali5"
