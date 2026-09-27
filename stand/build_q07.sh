@@ -72,7 +72,7 @@ with open(va,encoding="utf-8") as f: s=f.read()
 
 # Android 11: use the 2-argument registerReceiver() overload.
 # Keep the stock Q07 register count unchanged.
-m=re.search(r'(\\.method public onCreate\\(\\)V\\n\\s*\\.registers \\d+\\n.*?invoke-super \\{p0\\}, Landroid/app/Application;->onCreate\\(\\)V\\n)',s,re.S)
+m=re.search(r'(\.method public onCreate\(\)V\n\s*\.registers \d+\n.*?invoke-super \{p0\}, Landroid/app/Application;->onCreate\(\)V\n)',s,re.S)
 if not m:
     raise RuntimeError("Q07 VoiceApp.onCreate super call not found")
 
