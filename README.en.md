@@ -1,9 +1,8 @@
-# Russian Voice Assistant for Changan A06 (C390)
+# Jarvis — Russian Voice Assistant for Changan Q07
 
 [Русский](README.md)
 
-An offline-first Russian voice assistant modification for the **Changan A06 / C390** head unit
-(MediaTek MT6897, Android 14 Automotive). It replaces the recognizer and voice of the stock
+An independent offline-first Russian voice assistant adaptation for the **Changan Q07** head unit (Qualcomm msmnile_gvmq, Android 11). It replaces the recognizer and voice of the stock
 assistant (`com.incall.apps.speechassistant`) with Russian, while riding the stock NLU / actuation
 pipeline so real car commands keep working.
 
@@ -33,12 +32,12 @@ Independent modification — **not affiliated with, endorsed by, or produced by 
 The stock `SpeechAssistant.apk` is disassembled (baksmali), a handful of methods are patched to tap the
 ASR audio, feed our recognized text into the NLU, and route TTS through our engine; our own code ships
 as an extra `classes7.dex` plus the model assets and JNI libs. The result is re‑zipped, zip‑aligned and
-signed with the **public AOSP test‑keys** — the C390 firmware is itself signed with those keys, so the
+signed with the **public AOSP test‑keys** — the Q07 firmware is itself signed with those keys, so the
 patched app installs as a normal system‑app update **without root**.
 
 ## Requirements
 
-- A Changan A06 / C390 head unit whose firmware is signed with AOSP test‑keys (stock for C390), reachable
+- A Changan Q07 head unit whose firmware is signed with AOSP test‑keys (stock for C390), reachable
   over `adb` (USB or network). **No root needed.**
 - Build host: **JDK 17**, **Android SDK** with `platforms;android-34` and `build-tools;34.0.0`, `adb`.
 - The **stock `SpeechAssistant.apk`** from *your* device (proprietary — not included here, see below).
@@ -83,7 +82,7 @@ The built APK is not kept in git (~930 MB, contains the patched stock app); it i
 `speechassistant-ru-vX.Y.Z.apk`, check the `.sha256`, install as below. The multilingual build (`multi`) is
 not published yet — it is still being debugged on the car; it can be built from source.
 
-Maintainer: `./release.sh 1.0.5 ./SpeechAssistant.orig.apk` builds, runs the tests, tags `v1.0.5` and
+Maintainer: **Jarvis**. `./release.sh 1.0.5 ./SpeechAssistant.orig.apk` builds, runs the tests, tags `v1.0.5` and
 uploads the APK with `gh`. Or push a `v*` tag and let `.github/workflows/release.yml` build and attach
 the APK (needs the secrets `STOCK_APK_URL`, `GIGAAM_MODEL_URL`, `TERA_SAMPLER_URL` — private URLs of
 the stock APK and the large models; `multi` also needs `GIGAAM_ML_MODEL_URL`). The mapper tests run on every push (`ci.yml`).
