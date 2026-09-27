@@ -440,6 +440,15 @@ public final class RuBridge {
         return fuzzyFix(text);
     }
 
+    /** Q07 Stage-1 text-only initialization. Does not touch TTS config, wake-word settings, or load models. */
+    public static void initTextOnly(final Context ctx) {
+        appCtx = ctx.getApplicationContext();
+        Ru2Zh.onUnsafeBlocked = new Ru2Zh.UnsafeListener() { public void blocked(String zh) {
+            Log.w(TAG, "ru2zh: UNSAFE blocked (ALLOW_UNSAFE=false): " + zh);
+            showOnScreen("Команда требует подтверждения", TYPE_FEEDBACK);
+        }};
+    }
+
     public static void init(final Context ctx) {
         Ru2Zh.onUnsafeBlocked = new Ru2Zh.UnsafeListener() { public void blocked(String zh) {
             Log.w(TAG, "ru2zh: UNSAFE blocked (ALLOW_UNSAFE=false): " + zh);
