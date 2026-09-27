@@ -46,9 +46,7 @@ rm -rf "$WD"
 mkdir -p "$WD"
 unzip -o -j "$SRC" classes5.dex >/dev/null
 
-java -jar "$ROOT/tools/baksmali.jar" d --api 34 "$WD/../q07_build/../q07_build/../../does-not-exist" 2>/dev/null || true
-# Re-run with the actual extracted dex path.
-cp classes5.dex "$WD/classes5.dex"
+cp "$PWD/classes5.dex" "$WD/classes5.dex"
 java -jar "$ROOT/tools/baksmali.jar" d --api 34 "$WD/classes5.dex" -o "$WD/smali5"
 
 SM="$WD/smali5"
