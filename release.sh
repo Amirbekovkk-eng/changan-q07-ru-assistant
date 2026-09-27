@@ -42,7 +42,7 @@ else
   git -C "$HERE" push origin "$TAG"
 fi
 
-NOTES="Russian voice assistant mod for Changan A06 (C390) — $TAG.
+NOTES="Russian voice assistant mod for Changan Q07 — $TAG.
 
 Install (no root):
 \`\`\`
