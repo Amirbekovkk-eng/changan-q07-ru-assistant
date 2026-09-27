@@ -71,13 +71,8 @@ va=f"{SM}/com/incall/apps/speechassistant/application/VoiceApp.smali"
 with open(va,encoding="utf-8") as f: s=f.read()
 
 # Android 11: use the 2-argument registerReceiver() overload.
-# Do NOT use the Android 13+ 3-argument overload used by the A06/Android-14 stand.
-m=re.search(r'(\.method public onCreate\(\)V\n\s*\.registers )\d+(\n.*?invoke-super \{p0\}, Landroid/app/Application;->onCreate\(\)V\n)',s,re.S)
-if not m:
-    raise RuntimeError("Q07 VoiceApp.onCreate not found")
-
-s=s[:m.start(1)] + m.group(1) + "5" + s[m.end(1):]
-m=re.search(r'(\.method public onCreate\(\)V\n\s*\.registers 5\n.*?invoke-super \{p0\}, Landroid/app/Application;->onCreate\(\)V\n)',s,re.S)
+# Keep the stock Q07 register count unchanged.
+m=re.search(r'(\\.method public onCreate\\(\\)V\\n\\s*\\.registers \\d+\\n.*?invoke-super \\{p0\\}, Landroid/app/Application;->onCreate\\(\\)V\\n)',s,re.S)
 if not m:
     raise RuntimeError("Q07 VoiceApp.onCreate super call not found")
 
@@ -86,9 +81,11 @@ inj=r'''
 
     new-instance v0, Lcom/stand/bridge/StandNluReceiver;
     invoke-direct {v0}, Lcom/stand/bridge/StandNluReceiver;-><init>()V
+
     new-instance v1, Landroid/content/IntentFilter;
     const-string v2, "com.stand.NLU"
     invoke-direct {v1, v2}, Landroid/content/IntentFilter;-><init>(Ljava/lang/String;)V
+
     invoke-virtual {p0, v0, v1}, Landroid/content/Context;->registerReceiver(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;
 '''
 s=s[:m.end()] + inj + s[m.end():]
