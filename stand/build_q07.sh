@@ -84,7 +84,7 @@ if not m:
     raise RuntimeError("Q07 VoiceApp.onCreate super call not found")
 
 inj=r'''
-    invoke-static {p0}, Lcom/stand/bridge/RuBridge;->init(Landroid/content/Context;)V
+    invoke-static {p0}, Lcom/stand/bridge/RuBridge;->initTextOnly(Landroid/content/Context;)V
 
     new-instance v0, Lcom/stand/bridge/StandNluReceiver;
     invoke-direct {v0}, Lcom/stand/bridge/StandNluReceiver;-><init>()V
