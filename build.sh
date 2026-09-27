@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Build the Russian voice-assistant mod for Changan A06 (C390).
+# Legacy generic build entry point. For Q07 use stand/build_q07.sh.
 #
 #   ./build.sh [path/to/SpeechAssistant.orig.apk] [out.apk]
 #   VARIANT=multi ./build.sh ...   — multilingual ASR (GigaAM-Multilingual: ru/kk/ky/uz/en) instead of
