@@ -1,5 +1,5 @@
-Russian Voice Assistant modification for Changan A06 (C390) — version 1.0.5
-Copyright (c) 2026 Tecrow.
+Jarvis — Russian Voice Assistant for Changan Q07 — version 1.0.5
+Copyright (c) 2026 Jarvis.
 This modification is distributed free of charge.
 
 LICENSE: PolyForm Noncommercial License 1.0.0.
