@@ -18,7 +18,7 @@ import android.util.Log;
  *   am broadcast -a com.stand.NLU -p com.incall.apps.speechassistant --es q 'текст'
  *     -> cloud dialog (chat)
  *   am broadcast -a com.stand.NLU -p com.incall.apps.speechassistant --es cmd 'открой окно водителя'
- *     -> mapCommand(phrase): known car command -> arbitration, else -> chat (same routing as live ASR)
+ *     -> Russian scenario engine (ru2zhAll): simple or compound command -> Q07 NLU, else -> chat
  *   am broadcast -a com.stand.NLU -p com.incall.apps.speechassistant --es status 1
  *     -> pushStatus(): collect car status snapshot -> POST our backend /aibox/loadStatus
  *   am broadcast -a com.stand.NLU -p com.incall.apps.speechassistant --es dicts 1
@@ -35,7 +35,7 @@ public class StandNluReceiver extends BroadcastReceiver {
         String cmd = intent.getStringExtra("cmd");
         if (cmd != null && !cmd.isEmpty()) {
             Log.i("RuBridge", "trigger phrase: " + cmd);
-            RuBridge.handlePhrase(cmd);
+            RuBridge.handlePhraseZh(cmd);
             return;
         }
         if (intent.hasExtra("keywake")) { Log.i("RuBridge", "trigger keyWakeTest"); RuBridge.keyWakeTest(); return; }
