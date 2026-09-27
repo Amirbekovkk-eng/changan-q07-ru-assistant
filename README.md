@@ -1,238 +1,119 @@
-# Русский голосовой ассистент для Changan A06 (C390)
+# Русский голосовой ассистент для Changan Q07
 
 [English](README.en.md)
 
-Модификация штатного голосового ассистента головного устройства **Changan A06 / C390**
-(MediaTek MT6897, Android 14 Automotive). Заменяет распознавание речи и голос ассистента
-на русские, а команды исполняет через **штатный** конвейер NLU → DM → CarService, поэтому
-климат, сиденья, окна, свет, медиа и прочее работают как с завода. Root не нужен.
+**Q07 adaptation** of the Russian voice-assistant architecture originally developed for Changan A06/C390.
 
-**Версия:** 1.0.5 · Распространяется бесплатно.
-Независимая модификация, **не связана с Changan Automobile** и не одобрена ею.
+## Target
 
-## Что умеет
+- **Vehicle:** Changan Q07
+- **Platform:** Qualcomm `msmnile_gvmq`
+- **Android:** 11
+- **Stock package:** `com.incall.apps.speechassistant`
+- **Stock application:** `com.incall.apps.speechassistant.application.VoiceApp`
 
-- **Офлайн-распознавание русской речи** — [GigaAM‑v3](https://github.com/salute-developers/GigaAM)
-  CTC через sherpa‑onnx, распознавание всей фразы целиком, открытый словарь.
-- **Русская озвучка** — [TeraTTS](https://github.com/Tera2Space/TeraTTS) (`ru_f2`, ONNX Runtime),
-  зарегистрирован как **штатный TTS‑движок**: все ответы ассистента звучат по‑русски.
-- **Команды офлайн (`ru2zh`)** — маппер на правилах превращает русскую фразу в каноническую
-  китайскую команду, которую понимает штатный NLU, и инжектит её в конвейер. Около 240 интентов
-  (климат, сиденья, окна и люк, свет, зеркала, HUD, ADAS, режимы, камеры, медиа, громкость по
-  каналам, состояние авто и т.д.) работают без сети.
-- **Онлайн‑часть (опционально)** — свободные вопросы, беседа, погода, а также команды, которые
-  офлайн‑маппер не знает или которые машина отклонила, уходят на бэкенд с LLM. Бэкенд может
-  вернуть готовый интент, китайскую команду «на пробу» или запустить установленное пользователем
-  приложение (например, построить маршрут в Яндекс Навигаторе).
-- **Пробуждение** — слово «нихао» (你好) или кнопка на руле. По кнопке играет короткий сигнал,
-  и можно сразу говорить; по слову — сигнал вместе с фразой «Чем могу помочь».
-- **Установка в один шаг** — приложение работает с `uid=system` на Permissive SELinux, поэтому при
-  первом запуске само прописывает свой TTS‑движок в `tts_config.txt` (с бэкапом) и ставит слово
-  пробуждения. Правок через `adb` не требуется.
+The original Q07 `SpeechAssistant.apk` is kept outside the repository as the stock reference/rollback artifact. The project builds a separate modified APK and does not modify the stock APK in place.
 
-## Принцип работы
+## Goal
+
+Keep the useful A06 architecture — especially **scenario execution of compound commands** — and replace the A06-specific integration points with Q07-specific adapters.
+
+Target pipeline:
 
 ```
-микрофон ──► штатный аудиофронтенд (AEC, wake‑word iFlytek)
-                 │  PCM (перехват в SrBaseSession)
-                 ▼
-          GigaAsr (sherpa‑onnx, офлайн)  ──► русский текст
-                 │
-                 ▼
-          RuBridge.handlePhraseZh
-                 │
-      ┌──────────┴───────────┐
-      ▼                      ▼
-  Ru2Zh.ru2zh()          бэкенд (LLM)  ◄── если маппер не знает фразу,
-  RU → кит. команда       │               вопрос, беседа, отказ машины
-      │                   │ nluResults / zhCommands / appActions / текст
-      ▼                   ▼
-  injectZh ──► штатный NLU → DM → CarService (актуация, как с завода)
-                 │
-                 ▼  текст ответа (китайский или уже русский из оверлеев)
-          TtsPlayer.start ──► ttsRewrite (CJK → RU) ──► PiperCaTts (TeraTTS) ──► динамики
+Russian speech
+    ↓
+Russian ASR
+    ↓
+RuBridge / Ru2Zh scenario engine
+    ↓
+Q07 NLU
+    ↓
+Q07 arbitration / DM
+    ↓
+Q07 vehicle functions
 ```
 
-Технически это **патч штатного `SpeechAssistant.apk`**: приложение разбирается baksmali, в
-несколько методов вставляются вызовы нашего кода (перехват аудио ASR, подмена запроса к NLU,
-перехват текста TTS, сигнал по кнопке), наш код добавляется отдельным `classes7.dex` вместе с
-моделями и JNI‑библиотеками, APK собирается обратно, выравнивается и подписывается
-**публичными AOSP test‑keys**. Прошивка C390 подписана теми же ключами, поэтому патченное
-приложение ставится как обычное обновление системного приложения — без root.
-
-Ключевые классы (`stand/asr-android/src/com/stand/`):
-
-| Класс | Роль |
-|---|---|
-| `bridge/RuBridge` | ядро: перехват PCM, вызов ASR, маршрутизация фразы (офлайн → бэкенд), инъекция в NLU, перевод текста TTS, детектор неудавшихся команд, запуск приложений, история диалога |
-| `bridge/Ru2Zh` | офлайн‑маппер RU → ZH; чистые строковые правила без Android, покрыт офлайн‑тестами |
-| `bridge/StandNluReceiver` | broadcast‑триггеры для отладки (`am broadcast -a com.stand.NLU …`) |
-| `asr/GigaAsr` | GigaAM‑v3 на sherpa‑onnx |
-| `tts/PiperCaTts` | реализация штатного интерфейса TTS‑движка (`ICaStreamTts`) поверх TeraTTS |
-| `tts/TeraTts`, `tts/tera/*` | синтез, ударения, раскрытие чисел, кэш фраз |
-| `tts/WakeChime` | сигнал пробуждения (`assets/stand/wake_chime.wav`) |
-
-Что делают smali‑патчи (`stand/build_sa.sh`):
-
-- `SrBaseSession` — PCM микрофона уходит в `RuBridge.feed`, штатный китайский распознаватель
-  отключён (`NO_CN_SR`), при этом wake‑word и детектор конца фразы остаются штатными;
-- `NluManager.onArbitrationResult` — пропускаются только наши результаты (`requestId` с префиксом
-  `stand`), плюс детектор «команда не распознана» для отправки на бэкенд;
-- `TtsPlayer.start` — весь текст, идущий в озвучку, переписывается с китайского на русский
-  (`TTS_REWRITE`), подсказки экрана не озвучиваются;
-- `TipsPlayer.playWakeUpTips` / `TipsManager.getWakeUpTipsFromClick` — пробуждение по кнопке
-  даёт маркер, по которому TTS‑движок играет сигнал вместо фразы (`WAKE_CHIME`);
-- эндпоинты Changan и телеметрия перенаправляются на `HOST` (по умолчанию недостижимый
-  `127.0.0.1`), чтобы ничего не уходило в китайское облако;
-- `SettingsUtil.getLanguage` → русский (`RUSSIAN_ASR`).
-
-## Требования
-
-- Головное устройство Changan A06 / C390 с прошивкой, подписанной AOSP test‑keys (штатно для
-  C390), доступ по `adb` (USB или Wi‑Fi). Root не нужен.
-- Хост сборки: **JDK 17**, **Android SDK** с `platforms;android-34` и `build-tools;34.0.0`, `adb`.
-  macOS: `brew install --cask android-commandlinetools openjdk@17`.
-- **Штатный `SpeechAssistant.apk` с вашей машины** — проприетарный компонент, в репозиторий не
-  входит.
-- Два файла моделей больше 100 МБ не хранятся в git — см. [MODELS.md](MODELS.md).
-
-## Сборка
-
-1. Вытащить штатный APK:
-
-   ```sh
-   SER=$(adb devices | awk '/device$/{print $1; exit}')
-   P=$(adb -s "$SER" shell pm path com.incall.apps.speechassistant | head -1 | sed 's/package://' | tr -d '\r')
-   adb -s "$SER" pull "$P" ./SpeechAssistant.orig.apk
-   ```
-
-2. Положить модели по путям из [MODELS.md](MODELS.md).
-
-3. Собрать (`JAVA_HOME` / `ANDROID_HOME` определяются автоматически, при необходимости экспортируйте):
-
-   ```sh
-   ./build.sh ./SpeechAssistant.orig.apk out/speechassistant-ru.apk
-   VARIANT=multi ./build.sh ./SpeechAssistant.orig.apk out/speechassistant-multi.apk
-   ```
-
-   Два варианта APK: `ru` — распознавание только русского (GigaAM‑v3); `multi` — мультиязычное
-   распознавание (GigaAM‑Multilingual): русский, казахский, кыргызский, узбекский, английский.
-   В `multi` русские фразы идут по обычному пути (команды офлайн через ru2zh), а фраза на другом
-   языке определяется по буквам и уходит на бэкенд с полем `lang` — тот отвечает и подтверждает
-   команды на том же языке. Озвучка остаётся русским голосом TeraTTS (казахские/кыргызские буквы
-   сводятся к ближайшим русским, латиница читается как есть).
-
-   Узбекский вдобавок имеет ОФЛАЙН‑маппер команд: `Uz2Ru` переписывает узбекскую фразу в русские
-   ключевые слова (стемы, числительные, отрицания, вопросы) и отдаёт её тому же `ru2zh`, так что
-   «oynani och», «haroratni 22 ga qo'y», «musiqani balandroq qil» исполняются без сети, как русские.
-   Проверяется тем же набором тестов: `tests_uz.tsv` — 1010 узбекских фраз с теми же ожидаемыми
-   китайскими командами, что и `tests.tsv`, плюс `chatter_uz.txt` (болтовня не должна стать командой).
-
-   `build.sh` делает два шага: `stand/asr-android/build_dex.sh` (javac + d8 → `classes7.dex`) и
-   `stand/build_sa.sh` (baksmali → патчи → упаковка dex/ассетов/библиотек → zipalign → подпись).
-
-Флаги `build_sa.sh` (переменные окружения), которые выставляет `build.sh`:
-
-| Флаг | Значение |
-|---|---|
-| `PROFILE=car HOST=…` | профиль машины; `HOST` — куда перенаправить эндпоинты Changan (по умолчанию тупик) |
-| `BRIDGE=1` | добавить `classes7.dex` и все хуки RuBridge |
-| `GIGAAM=1` | модель GigaAM в `assets/gigaam` |
-| `GIGAAM_ML=1` | вместо GigaAM‑v3 положить GigaAM‑Multilingual (`stand/asr-android/gigaam-ml/`) — вариант `multi` |
-| `TERA=1` | ассеты TeraTTS в `assets/tera` |
-| `PIPER=1` | JNI‑библиотеки sherpa‑onnx и onnxruntime (историческое имя флага) |
-| `NO_CN_SR=1` | отключить китайское распознавание, оставить wake‑word |
-| `TTS_REWRITE=1` | переписывать текст TTS с китайского на русский |
-| `RUSSIAN_ASR=1` | язык ассистента → русский |
-| `WAKE_CHIME=1` | сигнал по кнопке на руле (по умолчанию включён) |
-
-Бэкенд для онлайн‑части задаётся константой `BACKEND` в `RuBridge.java`; при недоступной сети
-или `OFFLINE_ONLY=true` ассистент работает полностью офлайн.
-
-## Готовый APK
-
-Собранный APK не хранится в git (он ~930 МБ и содержит патченное штатное приложение), а
-публикуется в [Releases](https://github.com/voronoff2803/changan-a06-ru-assistant/releases):
-скачайте `speechassistant-ru-vX.Y.Z.apk`, сверьте `.sha256` и ставьте по инструкции ниже. Мультиязычная
-сборка (`multi`) пока не публикуется: она ещё отлаживается на машине, собрать её можно из исходников.
-
-Публикация релиза (для мейнтейнера): `./release.sh 1.0.5 ./SpeechAssistant.orig.apk` — собирает,
-гоняет тесты, ставит тег `v1.0.5` и загружает APK в релиз через `gh`. Альтернатива —
-workflow `.github/workflows/release.yml`: по тегу `v*` GitHub Actions сам собирает и прикладывает
-APK к релизу; ему нужны секреты `STOCK_APK_URL`, `GIGAAM_MODEL_URL`, `TERA_SAMPLER_URL`
-(приватные ссылки на штатный APK и большие модели, для `multi` ещё `GIGAAM_ML_MODEL_URL`). Тесты маппера гоняются на каждый push
-(`.github/workflows/ci.yml`).
-
-## Установка
-
-```sh
-adb push out/speechassistant-ru.apk /data/local/tmp/sa.apk
-adb shell pm install -r -d -g -t /data/local/tmp/sa.apk
-adb shell am force-stop com.incall.apps.speechassistant
-```
-
-Первый запуск занимает до минуты: распаковываются модели (~600 МБ), прописывается TTS‑движок.
-Затем: «нихао» или кнопка на руле → «включи обогрев руля», «открой окно водителя», «сделай
-температуру 22», «громкость голоса тише», «включи круговой обзор», «какая погода в Москве».
-Полный список примеров команд — в [COMMANDS.md](COMMANDS.md).
-
-Замена сигнала пробуждения: положить свой WAV (24 кГц, моно, 16 бит) в
-`stand/asr-android/assets/wake_chime.wav` и пересобрать.
-
-## Тесты
-
-Маппер `Ru2Zh.java` (тот самый файл, что попадает в APK) покрыт офлайн‑тестами: 950 случаев
-«фраза → команда» и набор бытовых реплик, которые не должны становиться командами. Нужен только JDK:
-
-```sh
-sh ru2zh/translate-task/tests/run_tests.sh   # -> PASS=950 FAIL=0
-```
-
-Отладочные триггеры на машине (`adb shell am broadcast -a com.stand.NLU -p com.incall.apps.speechassistant …`):
-`--es rub64 <base64 русской фразы>` — прогнать фразу по тому же пути, что и голос;
-`--es zhb64 <base64 китайской команды>` — инжект китайской команды напрямую;
-`--es keywake 1` — симуляция кнопки на руле; `--es sayb64 <base64>` — озвучить текст штатным путём.
-
-## Удаление / возврат к заводскому
-
-```sh
-adb shell pm uninstall com.incall.apps.speechassistant   # удаляет обновление -> заводское приложение из /system
-```
-
-Мод при первом запуске сохраняет копию правленого `tts_config.txt` рядом (`tts_config.txt.bak`);
-голосом: «верни заводскую озвучку» / «включи русскую озвучку». Сброс головного устройства до
-заводских настроек тоже возвращает оригинал (мод живёт в `/data`, заводское приложение — в `/system`).
-
-## Ограничения
-
-- Дворники и омыватель голосом на этой комплектации заблокированы конфигурацией самого автомобиля
-  (штатный ассистент отказывает так же).
-- Температура салона не адресуется по зонам штатным NLU; сиденья, окна и свет — адресуются.
-- Штатная навигация работает только в Китае; маршруты строятся через установленный пользователем
-  навигатор (онлайн‑часть).
-
-## Структура репозитория
+For compound commands:
 
 ```
-build.sh                     сборка в один шаг: classes7 + патч/упаковка/подпись
-stand/build_sa.sh            baksmali -> smali-патчи -> dex/ассеты/библиотеки -> zipalign -> подпись
-stand/env.sh                 тулчейн и пути к ключам
-stand/asr-android/           наш код и модели
-  src/com/stand/**           RuBridge, Ru2Zh, StandNluReceiver, GigaAsr, PiperCaTts, TeraTts, WakeChime
-  build_dex.sh               javac + d8 -> classes7.dex
-  assets/wake_chime.wav      сигнал пробуждения
-  gigaam/                    GigaAM-v3 int8 ONNX + tokens
-  piper/jni/arm64-v8a/       JNI sherpa-onnx + onnxruntime
-  libs/ src-stubs/ sherpa-src/  зависимости времени компиляции
-tools/                       baksmali/smali/uber-apk-signer, AOSP test-keys, ассеты TeraTTS
-ru2zh/translate-task/tests/  офлайн-тесты Ru2Zh (tests.tsv, chatter.txt, run_tests.sh)
+«закрой все окна и выключи климат»
+        ↓
+command 1 → Q07 NLU
+        ↓
+command 2 → Q07 NLU
 ```
 
-## Лицензия
+The A06 mapper already contains the important safety property: if a compound phrase contains an unknown clause, the whole phrase is rejected instead of executing only part of it.
 
-Исходники открыты на условиях **PolyForm Noncommercial License 1.0.0** — **только некоммерческое
-использование** (см. [LICENSE](LICENSE)). Модификация распространяется бесплатно. Сторонние
-компоненты (модели, JNI‑библиотеки, инструменты) сохраняют свои лицензии — см.
-[THIRD_PARTY.md](THIRD_PARTY.md).
+## Q07 stock SpeechAssistant findings
 
-**Без гарантий.** Голосовое управление автомобилем может ошибаться; используйте на свой риск.
+The supplied Q07 APK contains the following relevant components:
+
+- `NluManager`
+- `CloudNlu`
+- `BusinessController`
+- `SpeechTestManager`
+- `SrService`
+- `SpeechClientService`
+- `UiService`
+- `TtsPlayer`
+- `TtsPlayer2`
+
+The APK also exposes system-level integration and Changan-specific permissions. The detailed manifest analysis is documented in `Q07_COMPATIBILITY.md`.
+
+## Development stages
+
+### Stage 1 — text → Q07 NLU
+
+Already prepared in `stand/build_q07.sh`.
+
+The modified APK receives a private development broadcast:
+
+```bash
+adb shell am broadcast \
+  -a com.stand.NLU \
+  -p com.incall.apps.speechassistant \
+  --es cmd 'открой окно водителя'
+```
+
+The trigger calls the Russian scenario engine and then the Q07 NLU boundary. This stage deliberately does **not** replace the microphone or Chinese ASR.
+
+### Stage 2 — Q07 microphone / ASR adapter
+
+The A06 `SrBaseSession` PCM hook must be replaced with the actual Q07 audio/ASR callback. It is not assumed that the A06 callback exists on Q07.
+
+### Stage 3 — Russian TTS
+
+Adapt the existing TeraTTS/PiperCaTts integration to the Q07 TTS process and Q07 `TtsPlayer` implementation.
+
+### Stage 4 — wake button / wake word
+
+Adapt the A06 wake handling only after the Q07 wake path is confirmed.
+
+### Stage 5 — full vehicle test
+
+Test:
+1. single Russian command;
+2. two-command scenario;
+3. three-command scenario;
+4. unknown + known mixed phrase;
+5. climate/window/light/media commands;
+6. rollback to stock.
+
+## Repository layout
+
+```
+stand/
+  asr-android/        Russian ASR/TTS + scenario engine
+  patches/            A06 reference patches and notes
+  build_q07.sh        Q07 Stage-1 builder
+Q07_COMPATIBILITY.md  Q07-specific findings
+Q07_ADAPTATION.md     adaptation scope
+```
+
+## Important
+
+This is an independent modification project. It is not affiliated with or endorsed by Changan Automobile.
+
+The stock Q07 SpeechAssistant is proprietary and is not committed to this repository.
