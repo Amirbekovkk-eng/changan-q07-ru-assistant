@@ -11,7 +11,7 @@ Confirmed:
 - stock APK contains `classes.dex` through `classes6.dex`
 - the relevant SpeechAssistant application/NLU/TTS classes are in `classes5.dex`
 - APK signing certificate SHA-1:
-  `27:19:6E:38:6B:87:5E:76:AD:F7:00:E7:EA:84:C6:EE:E3:3D:FA`
+  `27:19:6E:38:6B:87:5E:76:AD:F7:00:E7:EA:84:E4:C6:EE:E3:3D:FA`
 - the repository AOSP platform certificate has the same SHA-1 fingerprint.
 
 ## Important architectural finding
