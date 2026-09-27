@@ -145,7 +145,7 @@ PY
 java -jar "$ROOT/tools/smali.jar" a --api 34 "$WD/smali5" -o "$WD/classes5.dex"
 
 cp "$SRC" "$WD/out.apk"
-(cd "$WD" && zip -j -q out.apk classes5.dex)
+(cd "$WD" && zip -q -d out.apk classes5.dex >/dev/null 2>&1 || true && zip -j -q out.apk classes5.dex)
 
 # Add our bridge as classes7.dex.
 cp "$HERE/asr-android/build/dex7/classes.dex" "$WD/classes7.dex"
