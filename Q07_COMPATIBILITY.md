@@ -16,7 +16,7 @@ Confirmed:
 
 ## Important architectural finding
 
-The existing A06 project already contains the scenario engine we want to preserve:
+The scenario engine used by this project provides:
 - `Ru2Zh.ru2zhAll()` supports simple commands and compound commands.
 - Compound clauses are serialized with a delay and sent one by one.
 - A phrase is rejected as a whole if any clause is not understood, avoiding partial execution.
@@ -61,7 +61,7 @@ Do NOT yet hook:
 - Chinese ASR shutdown
 - TTS replacement
 
-Those are separate stages. The reason is that the A06 `SrBaseSession` hook is platform-specific and must not be assumed to exist on Q07.
+Those are separate stages. The reason is that the platform-specific `SrBaseSession` hook must not be assumed to exist on Q07.
 
 ## Stage 1 test trigger
 
