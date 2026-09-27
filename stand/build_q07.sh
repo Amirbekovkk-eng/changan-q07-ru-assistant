@@ -33,6 +33,12 @@ OUT="${2:?usage: build_q07.sh <stock SpeechAssistant.apk> <out.apk>}"
 TTS_HOOK="${TTS_HOOK:-0}"
 TTS_REWRITE="${TTS_REWRITE:-0}"
 
+# Load the shared Android/JDK toolchain when the caller has not sourced env.sh.
+if [ -f "$HERE/env.sh" ]; then
+  # shellcheck disable=SC1091
+  source "$HERE/env.sh"
+fi
+
 case "$SRC" in /*) ;; *) SRC="$(pwd)/$SRC";; esac
 case "$OUT" in /*) ;; *) OUT="$(pwd)/$OUT";; esac
 [ -f "$SRC" ] || { echo "Stock APK not found: $SRC"; exit 1; }
