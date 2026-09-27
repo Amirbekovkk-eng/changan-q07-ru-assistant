@@ -1,8 +1,10 @@
-# Русский голосовой ассистент для Changan Q07
+# Jarvis — Russian Voice Assistant for Changan Q07
+
+**Maintainer: Jarvis**
 
 [English](README.en.md)
 
-**Q07 adaptation** of the Russian voice-assistant architecture originally developed for Changan A06/C390.
+Independent Russian voice-assistant adaptation for Changan Q07.
 
 ## Target
 
@@ -16,7 +18,7 @@ The original Q07 `SpeechAssistant.apk` is kept outside the repository as the sto
 
 ## Goal
 
-Keep the useful A06 architecture — especially **scenario execution of compound commands** — and replace the A06-specific integration points with Q07-specific adapters.
+The project uses an independent scenario engine for compound commands and integrates it directly with the Q07 SpeechAssistant/NLU boundary.
 
 Target pipeline:
 
@@ -44,7 +46,7 @@ command 1 → Q07 NLU
 command 2 → Q07 NLU
 ```
 
-The A06 mapper already contains the important safety property: if a compound phrase contains an unknown clause, the whole phrase is rejected instead of executing only part of it.
+The scenario mapper already contains the important safety property: if a compound phrase contains an unknown clause, the whole phrase is rejected instead of executing only part of it.
 
 ## Q07 stock SpeechAssistant findings
 
@@ -106,7 +108,7 @@ Test:
 ```
 stand/
   asr-android/        Russian ASR/TTS + scenario engine
-  patches/            A06 reference patches and notes
+  patches/            engineering reference patches and notes
   build_q07.sh        Q07 Stage-1 builder
 Q07_COMPATIBILITY.md  Q07-specific findings
 Q07_ADAPTATION.md     adaptation scope
