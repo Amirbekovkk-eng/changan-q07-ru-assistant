@@ -1,6 +1,9 @@
-# Changan Q07 Russian Assistant
+# Jarvis — Changan Q07 Russian Assistant
 
-Q07 adaptation of the Changan A06 Russian Assistant project.
+**Maintainer: Jarvis**
+
+
+Independent Q07 adaptation of the Russian voice-assistant stack.
 
 Target:
 - Changan Q07
@@ -10,7 +13,7 @@ Target:
 
 The original Q07 SpeechAssistant is preserved as the rollback/reference version.
 
-This project keeps the A06 scenario-execution architecture while replacing A06-specific integration points with Q07-specific adapters.
+The project uses a Q07-specific integration layer around the scenario engine and stock Q07 NLU boundary.
 
 ## Status
 
