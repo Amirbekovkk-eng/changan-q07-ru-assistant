@@ -198,6 +198,17 @@ if [ "$Q07_VOICE" = "1" ]; then
   echo "[q07] Q07 voice assets packaged"
 fi
 
+if [ "$TTS_HOOK" = "1" ]; then
+  TDIR="${TERA_DIR:-$ROOT/tools/tera-tts-java/assets}"
+  [ -d "$TDIR/models" ] || { echo "[q07] TTS_HOOK=1 requires TeraTTS models: $TDIR/models"; exit 1; }
+  [ -d "$TDIR/styles" ] || { echo "[q07] TTS_HOOK=1 requires TeraTTS styles: $TDIR/styles"; exit 1; }
+  rm -rf "$WD/assets/tera"; mkdir -p "$WD/assets/tera"
+  cp -r "$TDIR/models" "$TDIR/styles" "$TDIR/unicode_indexer.json" "$WD/assets/tera/"
+  [ -f "$TDIR/ruaccent.bin" ] && cp "$TDIR/ruaccent.bin" "$WD/assets/tera/" || true
+  (cd "$WD" && zip -q -0 -r out.apk assets/tera)
+  echo "[q07] TeraTTS assets packaged"
+fi
+
 "$ZIPALIGN" -p -f 4 "$WD/out.apk" "$WD/aligned.apk"
 "$APKSIGNER" sign --key "$ROOT/tools/platform-key/platform.pk8" --cert "$ROOT/tools/platform-key/platform.x509.pem" --out "$OUT" "$WD/aligned.apk"
 
