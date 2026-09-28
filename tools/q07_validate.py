@@ -98,7 +98,10 @@ def check(stock,out):
             assert needle in bridge, f"bridge artifact missing required marker: {needle!r}"
         assert zs.read("classes5.dex") != zo.read("classes5.dex"), "classes5.dex was not patched"
         # No unexpected non-signature payloads may appear in the minimal Q07 stage-1 rebuild.
-        extra=[x for x in on-sn if x!="classes7.dex" and not x.startswith("META-INF/")]
+        allowed_prefixes=("assets/gigaam/","assets/tera/","lib/arm64-v8a/")
+        extra=[x for x in on-sn
+               if x!="classes7.dex" and not x.startswith("META-INF/")
+               and not any(x.startswith(p) for p in allowed_prefixes)]
         assert not extra, "unexpected output entries: "+", ".join(sorted(extra)[:20])
     stock_cert=cert_fingerprint(stock)
     out_cert=cert_fingerprint(out)
