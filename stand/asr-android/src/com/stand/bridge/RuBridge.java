@@ -6,8 +6,10 @@
  */
 package com.stand.bridge;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.res.AssetManager;
 import android.util.Log;
 import java.io.File;
@@ -199,6 +201,24 @@ public final class RuBridge {
         return null;
     }
     private static final String ACTION = "com.stand.NLU";
+    private static BroadcastReceiver standNluReceiver;
+
+    /** Register the Q07 test receiver exactly once per SpeechAssistant process. */
+    public static synchronized void registerStandNluReceiver(Context ctx) {
+        if (standNluReceiver != null) {
+            Log.i(TAG, "Q07_NLU receiver already registered");
+            return;
+        }
+        try {
+            Context app = ctx.getApplicationContext();
+            BroadcastReceiver r = new StandNluReceiver();
+            app.registerReceiver(r, new IntentFilter(ACTION));
+            standNluReceiver = r;
+            Log.i(TAG, "Q07_NLU receiver registered");
+        } catch (Throwable t) {
+            Log.e(TAG, "Q07_NLU receiver registration failed", t);
+        }
+    }
     private static Context appCtx;
     private static volatile String lastText = "";   // latest ASR hypothesis for current utterance
     /** Language of the current utterance ("ru" | "kk" | "ky" | "uz" | "en"), sent to the backend as
