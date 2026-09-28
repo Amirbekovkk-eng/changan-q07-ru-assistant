@@ -32,6 +32,7 @@ SRC="${1:?usage: build_q07.sh <stock SpeechAssistant.apk> <out.apk>}"
 OUT="${2:?usage: build_q07.sh <stock SpeechAssistant.apk> <out.apk>}"
 TTS_HOOK="${TTS_HOOK:-0}"
 TTS_REWRITE="${TTS_REWRITE:-0}"
+Q07_VOICE="${Q07_VOICE:-0}"
 
 # Load the shared Android/JDK toolchain when the caller has not sourced env.sh.
 if [ -f "$HERE/env.sh" ]; then
@@ -70,12 +71,13 @@ SM="$WD/smali5"
 APP="com/incall/apps/speechassistant"
 BRIDGE="Lcom/stand/bridge/RuBridge;"
 
-python3 - "$SM" "$TTS_HOOK" "$TTS_REWRITE" <<'PY'
+python3 - "$SM" "$TTS_HOOK" "$TTS_REWRITE" "$Q07_VOICE" <<'PY'
 import os, re, sys
 
 SM=sys.argv[1]
 TTS_HOOK=sys.argv[2]=="1"
 TTS_REWRITE=sys.argv[3]=="1"
+Q07_VOICE=sys.argv[4]=="1"
 
 def repl(path, sig, body):
     with open(path, encoding="utf-8") as f: s=f.read()
@@ -107,6 +109,27 @@ with open(va,"w",encoding="utf-8") as f: f.write(s)
 # scenario engine and then calls NluManager.onFinalAsrResult() with the Q07-compatible
 # signature confirmed from stock classes5.dex:
 # (String requestId, int direction, String asrText, boolean confident).
+
+if Q07_VOICE:
+    # Directly verified from stock Q07 DEX:
+    # SpeechInterfaceImpl.sendSpeechData(I,[B) -> AudioListener.onSpeechData(I,[B)
+    # SpeechInterfaceImpl.speechStart(I) -> AudioListener.onSpeechStart(IZ)
+    # SpeechInterfaceImpl.speechEnd(I,String,String) -> AudioListener.onSpeechEnd(...)
+    sp=f"{SM}/com/incall/apps/speechassistant/controller/SpeechInterfaceImpl.smali"
+    with open(sp,encoding="utf-8") as f: ss=f.read()
+    hooks=[
+        (r'(\.method public sendSpeechData\(I\[B\)V\n\s*\.registers \d+\n)',
+         '    invoke-static {p1, p2}, Lcom/stand/bridge/RuBridge;->q07SpeechData(I[B)V\\n'),
+        (r'(\.method public speechStart\(I\)V\n\s*\.registers \d+\n)',
+         '    const/4 v0, 0x1\\n    invoke-static {p1, v0}, Lcom/stand/bridge/RuBridge;->q07SpeechStart(IZ)V\\n'),
+        (r'(\.method public speechEnd\(ILjava/lang/String;Ljava/lang/String;\)Z\n\s*\.registers \d+\n)',
+         '    invoke-static {p1, p2, p3}, Lcom/stand/bridge/RuBridge;->q07SpeechEnd(ILjava/lang/String;Ljava/lang/String;)V\\n')
+    ]
+    for pat,body in hooks:
+        mm=re.search(pat,ss)
+        if not mm: raise RuntimeError("Q07 voice hook target not found: "+pat)
+        ss=ss[:mm.end()]+body.replace('\\n','\\n')+ss[mm.end():]
+    with open(sp,"w",encoding="utf-8") as f: f.write(ss)
 
 if TTS_HOOK:
     for name in ("TtsPlayer.smali","TtsPlayer2.smali"):
