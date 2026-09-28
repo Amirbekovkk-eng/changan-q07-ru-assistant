@@ -97,10 +97,11 @@ m=re.search(r'(\.method public onCreate\(\)V\n\s*\.registers \d+\n.*?invoke-supe
 if not m:
     raise RuntimeError("Q07 VoiceApp.onCreate super call not found")
 
-inj=r'''
-    invoke-static {p0}, Lcom/stand/bridge/RuBridge;->initTextOnly(Landroid/content/Context;)V
-    invoke-static {p0}, Lcom/stand/bridge/RuBridge;->registerStandNluReceiver(Landroid/content/Context;)V
-'''
+inj = (
+    "    invoke-static {p0}, Lcom/stand/bridge/RuBridge;->"
+    + ("init(Landroid/content/Context;)V\n" if Q07_VOICE else "initTextOnly(Landroid/content/Context;)V\n")
+    + "    invoke-static {p0}, Lcom/stand/bridge/RuBridge;->registerStandNluReceiver(Landroid/content/Context;)V\n"
+)
 s=s[:m.end()] + inj + s[m.end():]
 with open(va,"w",encoding="utf-8") as f: f.write(s)
 
