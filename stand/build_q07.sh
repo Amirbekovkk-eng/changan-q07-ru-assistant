@@ -122,7 +122,7 @@ if Q07_VOICE:
     with open(sp,encoding="utf-8") as f: ss=f.read()
     hooks=[
         (r'(\.method public sendSpeechData\(I\[B\)V\n\s*\.registers \d+\n)',
-         '    invoke-static {p1, p2}, Lcom/stand/bridge/RuBridge;->q07SpeechData(I[B)V\n'),
+         '    invoke-static {p1, p2}, Lcom/stand/bridge/RuBridge;->q07SpeechData(I[B)V\n' + ('    return-void\n' if Q07_NO_STOCK_ASR else '')),
         (r'(\.method public speechStart\(I\)V\n\s*\.registers \d+\n)',
          '    const/4 v0, 0x1\n    invoke-static {p1, v0}, Lcom/stand/bridge/RuBridge;->q07SpeechStart(IZ)V\n'),
         (r'(\.method public speechEnd\(ILjava/lang/String;Ljava/lang/String;\)Z\n\s*\.registers \d+\n)',
