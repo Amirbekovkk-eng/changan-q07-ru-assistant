@@ -33,6 +33,7 @@ OUT="${2:?usage: build_q07.sh <stock SpeechAssistant.apk> <out.apk>}"
 TTS_HOOK="${TTS_HOOK:-0}"
 TTS_REWRITE="${TTS_REWRITE:-0}"
 Q07_VOICE="${Q07_VOICE:-0}"
+Q07_NO_STOCK_ASR="${Q07_NO_STOCK_ASR:-1}"
 
 # Load the shared Android/JDK toolchain when the caller has not sourced env.sh.
 if [ -f "$HERE/env.sh" ]; then
@@ -71,13 +72,14 @@ SM="$WD/smali5"
 APP="com/incall/apps/speechassistant"
 BRIDGE="Lcom/stand/bridge/RuBridge;"
 
-python3 - "$SM" "$TTS_HOOK" "$TTS_REWRITE" "$Q07_VOICE" <<'PY'
+python3 - "$SM" "$TTS_HOOK" "$TTS_REWRITE" "$Q07_VOICE" "$Q07_NO_STOCK_ASR" <<'PY'
 import os, re, sys
 
 SM=sys.argv[1]
 TTS_HOOK=sys.argv[2]=="1"
 TTS_REWRITE=sys.argv[3]=="1"
 Q07_VOICE=sys.argv[4]=="1"
+Q07_NO_STOCK_ASR=sys.argv[5]=="1"
 
 def repl(path, sig, body):
     with open(path, encoding="utf-8") as f: s=f.read()
