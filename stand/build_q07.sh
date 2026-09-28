@@ -84,15 +84,7 @@ if not m:
 
 inj=r'''
     invoke-static {p0}, Lcom/stand/bridge/RuBridge;->initTextOnly(Landroid/content/Context;)V
-
-    new-instance v0, Lcom/stand/bridge/StandNluReceiver;
-    invoke-direct {v0}, Lcom/stand/bridge/StandNluReceiver;-><init>()V
-
-    new-instance v1, Landroid/content/IntentFilter;
-    const-string v2, "com.stand.NLU"
-    invoke-direct {v1, v2}, Landroid/content/IntentFilter;-><init>(Ljava/lang/String;)V
-
-    invoke-virtual {p0, v0, v1}, Landroid/content/Context;->registerReceiver(Landroid/content/BroadcastReceiver;Landroid/content/IntentFilter;)Landroid/content/Intent;
+    invoke-static {p0}, Lcom/stand/bridge/RuBridge;->registerStandNluReceiver(Landroid/content/Context;)V
 '''
 s=s[:m.end()] + inj + s[m.end():]
 with open(va,"w",encoding="utf-8") as f: f.write(s)
