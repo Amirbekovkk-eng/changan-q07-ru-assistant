@@ -6,7 +6,11 @@ D="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 AJAR="${ANDROID_HOME:-/opt/homebrew/share/android-commandlinetools}/platforms/android-34/android.jar"
 BT="${ANDROID_HOME:-/opt/homebrew/share/android-commandlinetools}/build-tools/34.0.0"
 [ -x "${JAVA_HOME:-}/bin/javac" ] || export JAVA_HOME=/opt/homebrew/opt/openjdk@17; export PATH="$JAVA_HOME/bin:$PATH"
+[ -x "$BT/d8" ] || { echo "d8 not found: $BT/d8"; exit 1; }
+[ -f "$AJAR" ] || { echo "android.jar not found: $AJAR"; exit 1; }
 rm -rf "$D/build/dex7" "$D/build/stubs"; mkdir -p "$D/build/dex7" "$D/build/stubs"
+mapfile -d '' APP_SRC < <(find "$D/src/com/stand" -name '*.java' -print0)
+[ "${#APP_SRC[@]}" -gt 0 ] || { echo "No com/stand Java sources found"; exit 1; }
 # sherpa-onnx java sources (GigaAM ASR runs on sherpa-onnx); include if present.
 SHERPA_SRC=()
 if [ -d "$D/sherpa-src" ]; then
