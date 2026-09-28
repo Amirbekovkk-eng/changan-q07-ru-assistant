@@ -119,16 +119,16 @@ if Q07_VOICE:
     with open(sp,encoding="utf-8") as f: ss=f.read()
     hooks=[
         (r'(\.method public sendSpeechData\(I\[B\)V\n\s*\.registers \d+\n)',
-         '    invoke-static {p1, p2}, Lcom/stand/bridge/RuBridge;->q07SpeechData(I[B)V\\n'),
+         '    invoke-static {p1, p2}, Lcom/stand/bridge/RuBridge;->q07SpeechData(I[B)V\n'),
         (r'(\.method public speechStart\(I\)V\n\s*\.registers \d+\n)',
-         '    const/4 v0, 0x1\\n    invoke-static {p1, v0}, Lcom/stand/bridge/RuBridge;->q07SpeechStart(IZ)V\\n'),
+         '    const/4 v0, 0x1\n    invoke-static {p1, v0}, Lcom/stand/bridge/RuBridge;->q07SpeechStart(IZ)V\n'),
         (r'(\.method public speechEnd\(ILjava/lang/String;Ljava/lang/String;\)Z\n\s*\.registers \d+\n)',
-         '    invoke-static {p1, p2, p3}, Lcom/stand/bridge/RuBridge;->q07SpeechEnd(ILjava/lang/String;Ljava/lang/String;)V\\n')
+         '    invoke-static {p1, p2, p3}, Lcom/stand/bridge/RuBridge;->q07SpeechEnd(ILjava/lang/String;Ljava/lang/String;)V\n')
     ]
     for pat,body in hooks:
         mm=re.search(pat,ss)
         if not mm: raise RuntimeError("Q07 voice hook target not found: "+pat)
-        ss=ss[:mm.end()]+body.replace('\\n','\\n')+ss[mm.end():]
+        ss=ss[:mm.end()]+body.replace('\n','\n')+ss[mm.end():]
     with open(sp,"w",encoding="utf-8") as f: f.write(ss)
 
 if TTS_HOOK:
