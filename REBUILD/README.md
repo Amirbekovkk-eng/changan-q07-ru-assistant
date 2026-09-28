@@ -11,4 +11,6 @@ This branch is a clean rebuild line for Changan Q07 (Android 11, msmnile_gvmq).
 ## Pipeline target
 Stock Q07 audio/ASR boundary -> Russian ASR -> RuBridge -> Q07 NluManager -> stock vehicle action pipeline -> Russian TTS.
 
-The first task is to identify the real Q07 audio callback and its exact method signature. SrBaseSession is not assumed to exist on Q07.
+The Q07 audio boundary is now identified from the stock DEX: SpeechInterfaceImpl.speechStart(I), sendSpeechData(I,[B), and speechEnd(I,String,String), delegating to AudioListener.onSpeechStart/onSpeechData/onSpeechEnd. A Q07-specific voice hook is implemented behind Q07_VOICE=1.
+
+SrBaseSession is absent from all six stock Q07 DEX files and is not used by the Q07 hook.
