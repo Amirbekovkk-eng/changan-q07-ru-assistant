@@ -184,6 +184,20 @@ cp "$SRC" "$WD/out.apk"
 cp "$HERE/asr-android/build/dex7/classes.dex" "$WD/classes7.dex"
 (cd "$WD" && zip -j -q out.apk classes7.dex)
 
+if [ "$Q07_VOICE" = "1" ]; then
+  GDIR="${GIGAAM_DIR:-$HERE/asr-android/gigaam}"
+  JDIR="${Q07_JNI_DIR:-$HERE/asr-android/piper/jni/arm64-v8a}"
+  [ -f "$GDIR/model.int8.onnx" ] || { echo "[q07] Q07_VOICE=1 requires GigaAM model: $GDIR/model.int8.onnx"; exit 1; }
+  [ -f "$GDIR/tokens.txt" ] || { echo "[q07] Q07_VOICE=1 requires GigaAM tokens: $GDIR/tokens.txt"; exit 1; }
+  [ -d "$JDIR" ] || { echo "[q07] Q07_VOICE=1 requires JNI directory: $JDIR"; exit 1; }
+  rm -rf "$WD/assets/gigaam" "$WD/lib/arm64-v8a"
+  mkdir -p "$WD/assets/gigaam" "$WD/lib/arm64-v8a"
+  cp "$GDIR/model.int8.onnx" "$GDIR/tokens.txt" "$WD/assets/gigaam/"
+  cp "$JDIR"/*.so "$WD/lib/arm64-v8a/"
+  (cd "$WD" && zip -q -0 -r out.apk assets/gigaam lib/arm64-v8a)
+  echo "[q07] Q07 voice assets packaged"
+fi
+
 "$ZIPALIGN" -p -f 4 "$WD/out.apk" "$WD/aligned.apk"
 "$APKSIGNER" sign --key "$ROOT/tools/platform-key/platform.pk8" --cert "$ROOT/tools/platform-key/platform.x509.pem" --out "$OUT" "$WD/aligned.apk"
 
