@@ -26,6 +26,7 @@ import android.util.Log;
  */
 public class StandNluReceiver extends BroadcastReceiver {
     @Override public void onReceive(Context ctx, Intent intent) {
+        Log.i("Q07_RU_BRIDGE_RECEIVED", "action=" + intent.getAction() + " extras=" + intent.getExtras());
         String json = intent.getStringExtra("json");
         if (json != null && !json.isEmpty()) {
             Log.i("RuBridge", "trigger execArbitration");
