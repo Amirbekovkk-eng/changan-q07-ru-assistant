@@ -15,11 +15,29 @@ jobs:
         run: sh ru2zh/translate-task/tests/run_tests.sh
       - name: compile classes7 (javac only, no models needed)
         run: |
-          # d8 is not needed to check that the sources compile
+          set -euo pipefail
           AJAR="$ANDROID_HOME/platforms/android-34/android.jar"
           [ -f "$AJAR" ] || (yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "platforms;android-34" >/dev/null)
           mkdir -p /tmp/stubs /tmp/cls
-          javac -source 17 -target 17 -d /tmp/stubs -classpath "$AJAR" $(find stand/asr-android/src-stubs -name '*.java')
-          javac -source 17 -target 17 -encoding UTF-8 -d /tmp/cls \
-            -classpath "$AJAR:stand/asr-android/libs/ort-android-classes.jar:/tmp/stubs" \
-            $(find stand/asr-android/src/com/stand -name '*.java') $(find stand/asr-android/sherpa-src -name '*.java')
+          mapfile -d '' STUB_SRC < <(find stand/asr-android/src-stubs -name '*.java' -print0)
+          javac -source 17 -target 17 -d /tmp/stubs -classpath "$AJAR" "${STUB_SRC[@]}"
+          mapfile -d '' APP_SRC < <(find stand/asr-android/src/com/stand -name '*.java' -print0)
+          mapfile -d '' SHERPA_SRC < <(find stand/asr-android/sherpa-src -name '*.java' -print0)
+          javac -source 17 -target 17 -encoding UTF-8 -d /tmp/cls             -classpath "$AJAR:stand/asr-android/libs/ort-android-classes.jar:/tmp/stubs"             "${APP_SRC[@]}" "${SHERPA_SRC[@]}"
+      - name: Q07 source regression gate
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          build=Path("stand/build_q07.sh").read_text()
+          dex=Path("stand/asr-android/build_dex.sh").read_text()
+          rb=Path("stand/asr-android/src/com/stand/bridge/RuBridge.java").read_text()
+          val=Path("tools/q07_validate.py").read_text()
+          assert "261c3d9f042f2d66851a82364663ff5962267a719b6412e3518670240ca616f4" in build
+          assert "SpeechInterfaceImpl" in build
+          assert "q07SpeechStart" in rb and "q07SpeechData" in rb and "q07SpeechEnd" in rb
+          assert "find \"$D/src/com/stand\" -name '*.java' -print0" in dex
+          assert "SrBaseSession" not in build
+          assert "classes.dex" in val and "classes7.dex" in val
+          assert "ALL {cycles} CYCLES PASS" in val
+          print("Q07 source regression gate: PASS")
+          PY
