@@ -96,7 +96,11 @@ def check(stock,out):
         bridge=zo.read("classes7.dex")
         for needle in Q07_BRIDGE_STRINGS:
             assert needle in bridge, f"bridge artifact missing required marker: {needle!r}"
-        assert zs.read("classes5.dex") != zo.read("classes5.dex"), "classes5.dex was not patched"
+        patched5=zo.read("classes5.dex")
+        if b"q07SpeechData" in patched5 or b"q07SpeechStart" in patched5 or b"q07SpeechEnd" in patched5:
+            for needle in (b"q07SpeechStart",b"q07SpeechData",b"q07SpeechEnd"):
+                assert needle in patched5, f"partial Q07 audio hook injection: missing {needle!r}"
+        assert zs.read("classes5.dex") != patched5, "classes5.dex was not patched"
         # No unexpected non-signature payloads may appear in the minimal Q07 stage-1 rebuild.
         allowed_prefixes=("assets/gigaam/","assets/tera/","lib/arm64-v8a/")
         extra=[x for x in on-sn
