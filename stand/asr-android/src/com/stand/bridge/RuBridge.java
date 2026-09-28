@@ -498,6 +498,49 @@ public final class RuBridge {
         }
     }
 
+    /*
+     * Q07-native audio boundary, verified directly from the stock Q07 DEX:
+     * SpeechInterfaceImpl.speechStart(I) -> AudioListener.onSpeechStart(IZ)
+     * SpeechInterfaceImpl.sendSpeechData(I,[B) -> AudioListener.onSpeechData(I,[B)
+     * SpeechInterfaceImpl.speechEnd(I,String,String) -> AudioListener.onSpeechEnd(I,String,String)
+     *
+     * Q07 does NOT contain A06's SrBaseSession. Do not route Q07 through that class.
+     * We reuse the existing GigaAM utterance state machine with synthetic phases:
+     * start=1, audio=2, end=3.
+     */
+    public static void q07SpeechStart(int direction, boolean wake) {
+        try {
+            if (com.stand.asr.GigaAsr.class != null) {
+                com.stand.asr.GigaAsr.reset();
+                lastText = "";
+            }
+            wakeZone = direction > 0 ? direction : wakeZone;
+            Log.i(TAG, "Q07 ASR start direction=" + direction + " wake=" + wake);
+        } catch (Throwable t) { Log.e(TAG, "q07SpeechStart", t); }
+    }
+
+    public static void q07SpeechData(int direction, byte[] pcm) {
+        try {
+            if (pcm != null && pcm.length > 0) {
+                com.stand.asr.GigaAsr.accept(pcm, pcm.length);
+            }
+        } catch (Throwable t) { Log.e(TAG, "q07SpeechData", t); }
+    }
+
+    public static void q07SpeechEnd(int direction, String text, String requestId) {
+        try {
+            String asr = com.stand.asr.GigaAsr.finish();
+            if (asr == null) asr = "";
+            asr = asr.trim();
+            if (!asr.isEmpty()) {
+                lastText = asr;
+                String query = chooseQuery(asr);
+                if (query != null && !query.isEmpty()) handlePhraseZh(query);
+            }
+            Log.i(TAG, "Q07 ASR end direction=" + direction + " stockText=" + text + " requestId=" + requestId + " ru=" + asr);
+        } catch (Throwable t) { Log.e(TAG, "q07SpeechEnd", t); }
+    }
+
     /** Called from SrBaseSession ASR-data callback. session=this (unused); wp=phase; inst=SR instance.
      *  ASR engine is GigaAM-v3 (offline CTC) — the whole utterance is decoded once at wp==3. */
     public static void feed(Object session, int nm, int dt, long wp, byte[] pcm, int inst) {
