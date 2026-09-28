@@ -17,6 +17,17 @@ EXPECTED_PACKAGE = "com.incall.apps.speechassistant"
 EXPECTED_VERSION_CODE = "20260318"
 EXPECTED_VERSION_NAME = "V01.4074"
 REQUIRED_DEX = [f"classes{i}.dex" for i in range(1, 7)]
+Q07_FORBIDDEN_A06 = [b"SrBaseSession"]
+Q07_REQUIRED_STOCK_STRINGS = [
+    b"Lcom/incall/apps/speechassistant/nlu/NluManager;",
+    b"onFinalAsrResult",
+    b"Lcom/incall/apps/speechassistant/application/VoiceApp;",
+]
+Q07_BRIDGE_STRINGS = [
+    b"Lcom/stand/bridge/RuBridge;",
+    b"Q07_NLU receiver registered",
+    b"com.stand.NLU",
+]
 
 def sha256_file(path):
     h=hashlib.sha256()
@@ -72,6 +83,15 @@ def check(stock,out):
         for d in REQUIRED_DEX:
             if d != "classes5.dex":
                 assert zs.read(d)==zo.read(d), f"{d} changed unexpectedly"
+        stock_blob=b"".join(zs.read(d) for d in REQUIRED_DEX)
+        out_blob=b"".join(zo.read(d) for d in REQUIRED_DEX)
+        for needle in Q07_FORBIDDEN_A06:
+            assert needle not in stock_blob, f"forbidden A06-only hook symbol present in Q07 stock: {needle!r}"
+        for needle in Q07_REQUIRED_STOCK_STRINGS:
+            assert needle in stock_blob, f"required Q07 stock symbol/string missing: {needle!r}"
+        bridge=zo.read("classes7.dex")
+        for needle in Q07_BRIDGE_STRINGS:
+            assert needle in bridge, f"bridge artifact missing required marker: {needle!r}"
         assert zs.read("classes5.dex") != zo.read("classes5.dex"), "classes5.dex was not patched"
         # No unexpected non-signature payloads may appear in the minimal Q07 stage-1 rebuild.
         extra=[x for x in on-sn if x!="classes7.dex" and not x.startswith("META-INF/")]
