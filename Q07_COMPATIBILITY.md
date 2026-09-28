@@ -78,3 +78,18 @@ This tests the Russian scenario → Q07 NLU boundary without involving microphon
 ## Rollback
 
 The original Q07 APK is the input/reference APK and is never modified in place.
+
+
+## Binary audit correction — 2026-09-28
+
+The uploaded Q07 reference APK was rechecked directly, across all six DEX files.
+
+- SHA-256: `261c3d9f042f2d66851a82364663ff5962267a719b6412e3518670240ca616f4`
+- ZIP integrity: PASS
+- DEX layout: `classes.dex` through `classes6.dex`
+- `SrBaseSession`: **absent from all six DEX files** (not merely absent from classes5.dex)
+- Q07 stock contains `SpeechInterfaceImpl`, `RecordController`, and `SrEngineProxy` symbols, but their exact microphone callback hook must still be recovered from the real DEX method table before any PCM hook is written.
+- `NluManager` and `onFinalAsrResult` are present in the stock DEX.
+- This binary audit is the basis for rejecting a blind A06 `SrBaseSession` port.
+
+The rebuild validator now checks these invariants automatically and repeats the static gate by default for 100 cycles.
