@@ -16,7 +16,7 @@ EXPECTED_STOCK_SHA256 = "261c3d9f042f2d66851a82364663ff5962267a719b6412e35186702
 EXPECTED_PACKAGE = "com.incall.apps.speechassistant"
 EXPECTED_VERSION_CODE = "20260318"
 EXPECTED_VERSION_NAME = "V01.4074"
-REQUIRED_DEX = [f"classes{i}.dex" for i in range(1, 7)]
+REQUIRED_DEX = ["classes.dex"] + [f"classes{i}.dex" for i in range(2, 7)]
 Q07_FORBIDDEN_A06 = [b"SrBaseSession"]
 Q07_REQUIRED_STOCK_STRINGS = [
     b"Lcom/incall/apps/speechassistant/nlu/NluManager;",
