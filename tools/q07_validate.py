@@ -22,6 +22,10 @@ Q07_REQUIRED_STOCK_STRINGS = [
     b"Lcom/incall/apps/speechassistant/nlu/NluManager;",
     b"onFinalAsrResult",
     b"Lcom/incall/apps/speechassistant/application/VoiceApp;",
+    b"Lcom/incall/apps/speechassistant/controller/SpeechInterfaceImpl;",
+    b"sendSpeechData",
+    b"speechStart",
+    b"speechEnd",
 ]
 Q07_BRIDGE_STRINGS = [
     b"Lcom/stand/bridge/RuBridge;",
