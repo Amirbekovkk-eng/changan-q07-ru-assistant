@@ -6,7 +6,7 @@
 # - The stock APK is never modified in place.
 # - Q07 is Android 11 (API 30), package com.incall.apps.speechassistant.
 # - Q07's SpeechAssistant application classes are in classes5.dex (verified on stock APK).
-# - We intentionally do NOT hook SrBaseSession here: that A06 class is absent from Q07.
+# - We intentionally do NOT hook SrBaseSession here: its presence/signature on Q07 has not been proven from the stock Q07 DEX.
 #   Native Q07 ASR hook is a separate work item.
 #
 # First-stage goal:
@@ -42,6 +42,19 @@ fi
 case "$SRC" in /*) ;; *) SRC="$(pwd)/$SRC";; esac
 case "$OUT" in /*) ;; *) OUT="$(pwd)/$OUT";; esac
 [ -f "$SRC" ] || { echo "Stock APK not found: $SRC"; exit 1; }
+python3 - "$SRC" <<'PY'
+import hashlib,sys,zipfile
+p=sys.argv[1]
+h=hashlib.sha256(open(p,"rb").read()).hexdigest()
+want="261c3d9f042f2d66851a82364663ff5962267a719b6412e3518670240ca616f4"
+if h != want:
+    raise SystemExit(f"[q07] WRONG STOCK APK SHA-256: {h} (expected Q07 reference {want})")
+with zipfile.ZipFile(p) as z:
+    assert z.testzip() is None, "[q07] stock ZIP integrity failure"
+    for n in ("AndroidManifest.xml","classes.dex","classes2.dex","classes3.dex","classes4.dex","classes5.dex","classes6.dex"):
+        if n not in z.namelist(): raise SystemExit(f"[q07] stock missing {n}")
+print("[q07] stock preflight: PASS")
+PY
 mkdir -p "$(dirname "$OUT")"
 
 echo "[q07] compiling bridge -> classes7.dex"
@@ -152,5 +165,7 @@ cp "$HERE/asr-android/build/dex7/classes.dex" "$WD/classes7.dex"
 
 echo
 echo "[q07] built: $OUT"
+echo "[q07] running 100-cycle static regression gate..."
+APKSIGNER="$APKSIGNER" ZIPALIGN="$ZIPALIGN" python3 "$ROOT/tools/q07_validate.py" "$SRC" "$OUT" "${Q07_VALIDATE_CYCLES:-100}"
 echo "[q07] stock APK was used as input and was not modified."
 echo "[q07] stage 1 test: launch SpeechAssistant, then broadcast --es cmd '<Russian phrase>'"
